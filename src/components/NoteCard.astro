@@ -37,49 +37,51 @@ const href = notebookSlug
 <style>
   .note-card {
     display: block;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    border: 1px solid rgba(46, 125, 50, 0.15);
     text-decoration: none;
     color: inherit;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.08);
   }
 
   .note-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #6366f1;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.15);
+    border-color: rgba(46, 125, 50, 0.3);
+    background: white;
   }
 
   .note-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
+    gap: 0.875rem;
+    margin-bottom: 0.625rem;
   }
 
   .note-title {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #111827;
+    color: #2e7d32;
     flex: 1;
+    line-height: 1.4;
   }
 
   .note-date {
-    font-size: 0.875rem;
-    color: #9ca3af;
+    font-size: 0.8125rem;
+    color: #66bb6a;
     white-space: nowrap;
   }
 
   .note-excerpt {
-    margin: 0 0 1rem 0;
-    font-size: 0.875rem;
-    color: #6b7280;
-    line-height: 1.6;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.8125rem;
+    color: #558b2f;
+    line-height: 1.5;
   }
 
   .note-tags {
@@ -90,12 +92,13 @@ const href = notebookSlug
 
   .note-tag {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    background: #f3f4f6;
-    color: #6b7280;
-    border-radius: 12px;
+    padding: 0.1875rem 0.625rem;
+    font-size: 0.6875rem;
+    background: rgba(200, 230, 201, 0.6);
+    color: #2e7d32;
+    border-radius: 10px;
     font-weight: 500;
+    border: 1px solid rgba(46, 125, 50, 0.15);
   }
 
   @media (max-width: 768px) {
