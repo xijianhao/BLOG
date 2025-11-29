@@ -1,0 +1,202 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { getNotebookBySlug, getNotesByNotebook } from '../../utils/notebooks';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const notebooks = await getCollection('notebooks');
+  
+  return notebooks.map((notebook) => ({
+    params: { slug: notebook.slug },
+    props: { notebook },
+  }));
+}
+
+const { notebook } = Astro.props;
+const notes = await getNotesByNotebook(notebook.slug);
+const { title, description, icon, color } = notebook.data;
+---
+
+<Layout title={`${title} - 知识库`} description={description || undefined}>
+  <div class="notebook-page">
+    <div class="notebook-header">
+      <a href="/" class="back-link">← 返回首页</a>
+      <div class="notebook-info">
+        <div class="notebook-icon-large" style={`--notebook-color: ${color || '#6366f1'}`}>
+          {icon || '📚'}
+        </div>
+        <div>
+          <h1 class="notebook-title">{title}</h1>
+          {description && <p class="notebook-description">{description}</p>}
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <div class="notes-header">
+        <h2 class="notes-title">笔记列表</h2>
+        <span class="notes-count">{notes.length} 篇笔记</span>
+      </div>
+      {notes.length > 0 ? (
+        <div class="notes-grid">
+          {notes.map((note) => (
+            <NoteCard note={note} notebookSlug={notebook.slug} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>暂无笔记，快去添加一些吧！</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .notebook-page {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+  }
+
+  .back-link:hover {
+    opacity: 1;
+  }
+
+  .notebook-header {
+    margin-bottom: 3rem;
+  }
+
+  .notebook-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .notebook-icon-large {
+    font-size: 4rem;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--notebook-color, #6366f1) 0%, color-mix(in srgb, var(--notebook-color, #6366f1) 80%, transparent) 100%);
+    border-radius: 16px;
+    flex-shrink: 0;
+  }
+
+  .notebook-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #111827;
+  }
+
+  .notebook-description {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .notes-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+  }
+
+  .notes-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+  }
+
+  .notes-count {
+    font-size: 0.875rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #9ca3af;
+  }
+
+  @media (max-width: 768px) {
+    .notebook-info {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .notebook-icon-large {
+      width: 80px;
+      height: 80px;
+      font-size: 3rem;
+    }
+
+    .notebook-title {
+      font-size: 1.5rem;
+    }
+
+    .notes-section {
+      padding: 1.5rem;
+    }
+
+    .notes-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .notes-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+

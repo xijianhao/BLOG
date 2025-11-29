@@ -1,0 +1,288 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { getNotebookBySlug } from '../../../utils/notebooks';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  
+  return notes.map((note) => {
+    const notebookSlug = note.data.notebook;
+    // note.slug 可能包含路径，如 "react/react-hooks"
+    // [...note] 路由会自动处理路径，直接传递字符串即可
+    return {
+      params: { slug: notebookSlug, note: note.slug },
+      props: { note, notebookSlug },
+    };
+  });
+}
+
+// 直接使用 props 中传递的 note，避免重新查找
+const { note, notebookSlug } = Astro.props;
+
+const notebook = await getNotebookBySlug(notebookSlug);
+const { Content } = await note.render();
+const { title, date, tags } = note.data;
+---
+
+<Layout title={`${title} - ${notebook?.data.title || '知识库'}`}>
+  <article class="note-page">
+    <nav class="note-nav">
+      <a href={`/notebooks/${notebookSlug}`} class="nav-link">
+        ← 返回 {notebook?.data.title || '笔记本'}
+      </a>
+    </nav>
+
+    <header class="note-header">
+      <h1 class="note-title">{title}</h1>
+      <div class="note-meta">
+        <time class="note-date" datetime={date.toISOString()}>
+          {date.toLocaleDateString('zh-CN', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </time>
+        {tags && tags.length > 0 && (
+          <div class="note-tags">
+            {tags.map(tag => (
+              <span class="note-tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="note-content">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .note-page {
+    animation: fadeIn 0.5s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .note-nav {
+    margin-bottom: 2rem;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+  }
+
+  .note-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .note-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #111827;
+    line-height: 1.2;
+  }
+
+  .note-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .note-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .note-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .note-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .note-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    line-height: 1.8;
+    color: #374151;
+  }
+
+  .note-content :global(h1),
+  .note-content :global(h2),
+  .note-content :global(h3),
+  .note-content :global(h4),
+  .note-content :global(h5),
+  .note-content :global(h6) {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
+  }
+
+  .note-content :global(h1) {
+    font-size: 2rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+
+  .note-content :global(h2) {
+    font-size: 1.5rem;
+  }
+
+  .note-content :global(h3) {
+    font-size: 1.25rem;
+  }
+
+  .note-content :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .note-content :global(ul),
+  .note-content :global(ol) {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+  }
+
+  .note-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .note-content :global(code) {
+    background: #f3f4f6;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    color: #e11d48;
+  }
+
+  .note-content :global(pre) {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .note-content :global(pre code) {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: 0.875rem;
+  }
+
+  .note-content :global(blockquote) {
+    border-left: 4px solid #6366f1;
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-bottom: 1rem;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  .note-content :global(a) {
+    color: #6366f1;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .note-content :global(a:hover) {
+    border-bottom-color: #6366f1;
+  }
+
+  .note-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+  }
+
+  .note-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+
+  .note-content :global(th),
+  .note-content :global(td) {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .note-content :global(th) {
+    font-weight: 600;
+    background: #f9fafb;
+  }
+
+  @media (max-width: 768px) {
+    .note-header {
+      padding: 1.5rem;
+    }
+
+    .note-title {
+      font-size: 1.75rem;
+    }
+
+    .note-content {
+      padding: 1.5rem;
+    }
+
+    .note-content :global(h1) {
+      font-size: 1.5rem;
+    }
+
+    .note-content :global(h2) {
+      font-size: 1.25rem;
+    }
+
+    .note-content :global(pre) {
+      padding: 1rem;
+      font-size: 0.8125rem;
+    }
+  }
+</style>
+

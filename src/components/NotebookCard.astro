@@ -1,0 +1,102 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  notebook: CollectionEntry<'notebooks'>;
+}
+
+const { notebook } = Astro.props;
+const { title, description, icon, color } = notebook.data;
+---
+
+<a href={`/notebooks/${notebook.slug}`} class="notebook-card">
+  <div class="notebook-icon" style={`--notebook-color: ${color || '#6366f1'}`}>
+    {icon || '📚'}
+  </div>
+  <div class="notebook-content">
+    <h3 class="notebook-title">{title}</h3>
+    {description && <p class="notebook-description">{description}</p>}
+  </div>
+  <div class="notebook-arrow">→</div>
+</a>
+
+<style>
+  .notebook-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .notebook-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--notebook-color, #6366f1);
+  }
+
+  .notebook-icon {
+    font-size: 2.5rem;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--notebook-color, #6366f1) 0%, color-mix(in srgb, var(--notebook-color, #6366f1) 80%, transparent) 100%);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .notebook-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .notebook-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .notebook-description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .notebook-arrow {
+    font-size: 1.5rem;
+    color: #9ca3af;
+    transition: transform 0.2s ease;
+  }
+
+  .notebook-card:hover .notebook-arrow {
+    transform: translateX(4px);
+    color: var(--notebook-color, #6366f1);
+  }
+
+  @media (max-width: 768px) {
+    .notebook-card {
+      padding: 1rem;
+    }
+
+    .notebook-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 2rem;
+    }
+
+    .notebook-title {
+      font-size: 1.125rem;
+    }
+  }
+</style>
+

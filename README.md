@@ -1,46 +1,128 @@
-# Astro Starter Kit: Basics
+# 📚 知识库
+
+一个基于 Astro 构建的个人知识库系统，用于管理和展示各种类型的笔记。
+
+## ✨ 功能特性
+
+- 📖 **多笔记本管理**：支持创建多个笔记本分类（如 React、Vue、JavaScript、做饭等）
+- 📝 **笔记列表**：每个笔记本下可以包含多篇笔记
+- 🎨 **现代化 UI**：美观的渐变背景和卡片式设计
+- 🔍 **标签系统**：为笔记添加标签便于分类
+- 📱 **响应式设计**：完美适配移动端和桌面端
+- ⚡ **静态生成**：基于 Astro 的静态站点生成，性能优异
+
+## 🚀 快速开始
+
+### 安装依赖
 
 ```sh
-pnpm create astro@latest -- --template basics
+pnpm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### 启动开发服务器
 
-## 🚀 Project Structure
+```sh
+pnpm dev
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+访问 `http://localhost:4321` 查看效果。
 
-```text
+### 构建生产版本
+
+```sh
+pnpm build
+```
+
+### 预览生产构建
+
+```sh
+pnpm preview
+```
+
+## 📁 项目结构
+
+```
 /
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
+├── src/
+│   ├── content/          # 内容管理
+│   │   ├── notebooks/   # 笔记本配置
+│   │   ├── notes/       # 笔记内容
+│   │   └── config.ts    # Content Collections 配置
+│   ├── components/      # 组件
+│   │   ├── NotebookCard.astro
+│   │   └── NoteCard.astro
+│   ├── layouts/         # 布局
+│   │   └── Layout.astro
+│   ├── pages/           # 页面路由
+│   │   ├── index.astro  # 首页
+│   │   └── notebooks/   # 笔记本和笔记页面
+│   └── utils/           # 工具函数
+│       └── notebooks.ts
 └── package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## 📝 添加新笔记本
 
-## 🧞 Commands
+在 `src/content/notebooks/` 目录下创建新的 Markdown 文件，例如 `typescript.md`：
 
-All commands are run from the root of the project, from a terminal:
+```markdown
+---
+title: TypeScript
+description: TypeScript 学习笔记
+icon: 📘
+color: #3178c6
+order: 5
+---
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+# TypeScript 笔记本
 
-## 👀 Want to learn more?
+这里收集了所有关于 TypeScript 的学习笔记。
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 📄 添加新笔记
+
+在 `src/content/notes/` 目录下创建新的 Markdown 文件，例如 `typescript-basics.md`：
+
+```markdown
+---
+title: TypeScript 基础
+notebook: typescript
+date: 2024-01-30
+tags: ['typescript', '基础']
+excerpt: TypeScript 的基础语法和类型系统
+order: 1
+---
+
+# TypeScript 基础
+
+这里是笔记内容...
+```
+
+**注意**：`notebook` 字段必须与笔记本的 slug（文件名）匹配。
+
+## 🎨 自定义样式
+
+- 修改 `src/layouts/Layout.astro` 中的全局样式
+- 修改各个组件中的样式来调整外观
+- 笔记本颜色通过 `color` 字段自定义
+
+## 📚 示例笔记本
+
+系统已包含以下示例笔记本：
+
+- ⚛️ **React** - React 学习笔记和最佳实践
+- 🖖 **Vue** - Vue.js 框架学习笔记
+- 📜 **JavaScript** - JavaScript 核心知识
+- 🍳 **做饭** - 美食制作和烹饪技巧
+
+## 🛠️ 技术栈
+
+- [Astro](https://astro.build) - 静态站点生成器
+- [Content Collections](https://docs.astro.build/en/guides/content-collections/) - 内容管理
+- TypeScript - 类型安全
+- Markdown - 笔记格式
+
+## 📖 了解更多
+
+- [Astro 文档](https://docs.astro.build)
+- [Content Collections 指南](https://docs.astro.build/en/guides/content-collections/)
