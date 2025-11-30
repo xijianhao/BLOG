@@ -4,7 +4,7 @@ notebook: react
 date: 2024-01-20
 tags: ['react', '性能优化']
 excerpt: 提升 React 应用性能的实用技巧
-order: 2
+order: 4
 ---
 
 # React 性能优化技巧

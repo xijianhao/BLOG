@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import NoteIcon from './NoteIcon.astro';
+
 
 interface Props {
   note: CollectionEntry<'notes'>;
@@ -15,9 +15,6 @@ const href = notebookSlug
 ---
 
 <a href={href} class="note-card">
-  <div class="note-icon-wrapper" style={`--note-color: ${color || 'var(--color-text-secondary)'}`}>
-    <NoteIcon color={color || 'currentColor'} size={20} />
-  </div>
   <div class="note-content">
     <div class="note-header">
       <h3 class="note-title">{title}</h3>
