@@ -7,12 +7,46 @@ interface Props {
 
 const { notebook } = Astro.props;
 const { title, description, icon, color } = notebook.data;
+
+// 处理图标：如果是SVG，替换其中的颜色为动态颜色
+function processIcon(icon: string | null | undefined, color: string | null | undefined): string {
+  if (!icon) return '📚';
+  
+  // 清理多行字符串中的空白（frontmatter 中的 | 会保留换行和缩进）
+  // 规范化空白字符，但保持 SVG 结构
+  let cleanedIcon = icon.trim();
+  // 将换行和多个空格替换为单个空格
+  cleanedIcon = cleanedIcon.replace(/\s+/g, ' ').trim();
+  
+  // 如果是SVG，替换颜色为 currentColor（跟随主题色）
+  if (cleanedIcon.includes('<svg')) {
+    // 将 SVG 中的颜色替换为 currentColor，这样会跟随父元素的文本颜色（主题色）
+    let processed = cleanedIcon.replace(/(fill|stroke)=["']#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})["']/gi, `$1="currentColor"`);
+    
+    return processed;
+  }
+  
+  // 否则返回原始图标（emoji等）
+  return cleanedIcon;
+}
+
+const iconContent = processIcon(icon, color);
+const isSvg = iconContent.includes('<svg');
+
 ---
 
 <a href={`/notebooks/${notebook.slug}`} class="notebook-card">
-  <div class="notebook-icon" style={`--notebook-color: ${color || '#6366f1'}`}>
-    {icon || '📚'}
-  </div>
+  {isSvg ? (
+    <div 
+      class="notebook-icon" 
+      style={`--notebook-color: ${color || '#6366f1'}`}
+      set:html={iconContent}
+    />
+  ) : (
+    <div class="notebook-icon" style={`--notebook-color: ${color || '#6366f1'}`}>
+      {iconContent}
+    </div>
+  )}
   <div class="notebook-content">
     <h3 class="notebook-title">{title}</h3>
     {description && <p class="notebook-description">{description}</p>}
@@ -51,6 +85,18 @@ const { title, description, icon, color } = notebook.data;
     justify-content: center;
     border-radius: 12px;
     flex-shrink: 0;
+    background: var(--color-bg);
+    overflow: visible;
+    /* 设置图标颜色为主题色，SVG 中的 currentColor 会使用这个颜色 */
+    color: var(--color-text-primary);
+  }
+
+  .notebook-icon svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 
   .notebook-content {

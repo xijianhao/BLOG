@@ -20,6 +20,8 @@ const notes = defineCollection({
     tags: z.array(z.string()).optional(),
     excerpt: z.string().optional(),
     order: z.number().default(0),
+    icon: z.string().nullish(), // SVG 图标名称或路径
+    color: z.string().nullish(), // 图标颜色
   }),
 });
 

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import NoteIcon from './NoteIcon.astro';
 
 interface Props {
   note: CollectionEntry<'notes'>;
@@ -7,36 +8,43 @@ interface Props {
 }
 
 const { note, notebookSlug } = Astro.props;
-const { title, date, tags, excerpt } = note.data;
+const { title, date, tags, excerpt, icon, color } = note.data;
 const href = notebookSlug 
   ? `/notebooks/${notebookSlug}/${note.slug}`
   : `/notes/${note.slug}`;
 ---
 
 <a href={href} class="note-card">
-  <div class="note-header">
-    <h3 class="note-title">{title}</h3>
-    <time class="note-date" datetime={date.toISOString()}>
-      {date.toLocaleDateString('zh-CN', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })}
-    </time>
+  <div class="note-icon-wrapper" style={`--note-color: ${color || 'var(--color-text-secondary)'}`}>
+    <NoteIcon color={color || 'currentColor'} size={20} />
   </div>
-  {excerpt && <p class="note-excerpt">{excerpt}</p>}
-  {tags && tags.length > 0 && (
-    <div class="note-tags">
-      {tags.map(tag => (
-        <span class="note-tag">{tag}</span>
-      ))}
+  <div class="note-content">
+    <div class="note-header">
+      <h3 class="note-title">{title}</h3>
+      <time class="note-date" datetime={date.toISOString()}>
+        {date.toLocaleDateString('zh-CN', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
+      </time>
     </div>
-  )}
+    {excerpt && <p class="note-excerpt">{excerpt}</p>}
+    {tags && tags.length > 0 && (
+      <div class="note-tags">
+        {tags.map(tag => (
+          <span class="note-tag">{tag}</span>
+        ))}
+      </div>
+    )}
+  </div>
 </a>
 
 <style>
   .note-card {
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
     padding: 1rem 1.25rem;
     background: var(--color-bg);
     border-radius: 10px;
@@ -52,6 +60,31 @@ const href = notebookSlug
     box-shadow: 0 6px 16px rgba(89, 56, 44, 0.2);
     border-color: var(--color-text-secondary);
     background: var(--color-border);
+  }
+
+  .note-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 8px;
+    background: var(--color-border);
+    color: var(--note-color);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .note-card:hover .note-icon-wrapper {
+    background: var(--note-color);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .note-content {
+    flex: 1;
+    min-width: 0;
   }
 
   .note-header {
