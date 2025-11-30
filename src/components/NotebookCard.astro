@@ -3,9 +3,10 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   notebook: CollectionEntry<'notebooks'>;
+  noteCount?: number;
 }
 
-const { notebook } = Astro.props;
+const { notebook, noteCount = 0 } = Astro.props;
 const { title, description, icon, color } = notebook.data;
 
 // 处理图标：如果是SVG，替换其中的颜色为动态颜色
@@ -48,7 +49,10 @@ const isSvg = iconContent.includes('<svg');
     </div>
   )}
   <div class="notebook-content">
-    <h3 class="notebook-title">{title}</h3>
+    <div class="notebook-header">
+      <h3 class="notebook-title">{title}</h3>
+      <span class="note-count">{noteCount} 篇笔记</span>
+    </div>
     {description && <p class="notebook-description">{description}</p>}
   </div>
   <div class="notebook-arrow">→</div>
@@ -57,9 +61,9 @@ const isSvg = iconContent.includes('<svg');
 <style>
   .notebook-card {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
-    padding: 1.25rem;
+    padding: 1rem;
     background: var(--color-bg);
     border-radius: 12px;
     border: 1px solid var(--color-border);
@@ -67,6 +71,12 @@ const isSvg = iconContent.includes('<svg');
     color: inherit;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 6px rgba(89, 56, 44, 0.1);
+  }
+
+  @media (min-width: 769px) {
+    .notebook-card {
+      padding: 0.875rem 1rem;
+    }
   }
 
   .notebook-card:hover {
@@ -91,6 +101,14 @@ const isSvg = iconContent.includes('<svg');
     color: var(--color-text-primary);
   }
 
+  @media (min-width: 769px) {
+    .notebook-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 2.25rem;
+    }
+  }
+
   .notebook-icon svg {
     width: 100% !important;
     height: 100% !important;
@@ -102,13 +120,32 @@ const isSvg = iconContent.includes('<svg');
   .notebook-content {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .notebook-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .notebook-title {
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--color-text-primary);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .note-count {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .notebook-description {
@@ -142,6 +179,16 @@ const isSvg = iconContent.includes('<svg');
 
     .notebook-title {
       font-size: 1.125rem;
+    }
+
+    .notebook-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .note-count {
+      font-size: 0.75rem;
     }
   }
 </style>

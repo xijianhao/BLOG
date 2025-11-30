@@ -1,22 +1,69 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import NotebookCard from '../components/NotebookCard.astro';
-import { getAllNotebooks } from '../utils/notebooks';
+import NoteCard from '../components/NoteCard.astro';
+import { getAllNotebooks, getAllNotes } from '../utils/notebooks';
 import type { CollectionEntry } from 'astro:content';
 
 const notebooks = await getAllNotebooks();
+const allNotes = await getAllNotes();
+const latestNotes = allNotes.slice(0, 10);
+
+// 创建笔记本映射，用于快速查找笔记本信息
+const notebookMap = new Map<string, CollectionEntry<'notebooks'>>();
+notebooks.forEach((notebook) => {
+  notebookMap.set(notebook.slug, notebook);
+});
+
+// 计算每个笔记本的笔记数量
+const notebookNoteCounts = new Map<string, number>();
+allNotes.forEach((note) => {
+  const notebookSlug = note.data.notebook;
+  notebookNoteCounts.set(notebookSlug, (notebookNoteCounts.get(notebookSlug) || 0) + 1);
+});
+
+// 为每个笔记准备笔记本信息
+const latestNotesWithNotebook = latestNotes.map((note) => {
+  const notebook = notebookMap.get(note.data.notebook);
+  return {
+    note,
+    notebookSlug: note.data.notebook,
+    notebookIcon: notebook?.data.icon || null,
+    notebookColor: notebook?.data.color || null,
+  };
+});
 ---
 
 <Layout title="知识库 - 首页">
   <div class="home-container">
-    <div class="home-header">
-      <h1 class="home-title">我的知识库</h1>
-      <p class="home-subtitle">记录学习、工作和生活的点点滴滴</p>
-    </div>
-    <div class="notebooks-grid">
-      {notebooks.map((notebook: CollectionEntry<'notebooks'>) => (
-        <NotebookCard notebook={notebook} />
-      ))}
+    <div class="main-layout">
+      {latestNotes.length > 0 && (
+        <section class="latest-notes-section">
+          <h2 class="section-title">最新笔记</h2>
+          <div class="latest-notes-list">
+            {latestNotesWithNotebook.map(({ note, notebookSlug, notebookIcon, notebookColor }) => (
+              <NoteCard 
+                note={note} 
+                notebookSlug={notebookSlug}
+                notebookIcon={notebookIcon}
+                notebookColor={notebookColor}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      
+      <section class="notebooks-section">
+        <h2 class="section-title">笔记本</h2>
+        <div class="notebooks-grid">
+          {notebooks.map((notebook: CollectionEntry<'notebooks'>) => (
+            <NotebookCard 
+              notebook={notebook} 
+              noteCount={notebookNoteCounts.get(notebook.slug) || 0}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   </div>
 </Layout>
@@ -37,31 +84,127 @@ const notebooks = await getAllNotebooks();
     }
   }
 
-  .home-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  .main-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .latest-notes-section {
+    flex: 0 0 400px;
+    min-width: 0;
+  }
+
+  .notebooks-section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
     color: var(--color-text-primary);
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border);
   }
 
-  .home-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+  .latest-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .home-subtitle {
-    font-size: 1.125rem;
+  .latest-notes-list :global(.note-card) {
+    padding: 0.4375rem 0.875rem;
+  }
+
+  .latest-notes-list :global(.note-content) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .latest-notes-list :global(.note-header) {
+    margin-bottom: 0;
+    display: contents;
+  }
+
+  .latest-notes-list :global(.notebook-icon) {
+    order: 0;
+    margin-right: 0.25rem;
+  }
+
+  .latest-notes-list :global(.note-title) {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    margin: 0;
+    order: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .latest-notes-list :global(.note-excerpt) {
+    display: inline;
+    margin: 0;
+    font-size: 0.6875rem;
+    line-height: 1.3;
     color: var(--color-text-secondary);
-    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+    order: 2;
+    text-align: left;
+  }
+
+  .latest-notes-list :global(.note-excerpt)::before {
+    content: '· ';
+    margin: 0 0.25rem;
+  }
+
+  .latest-notes-list :global(.note-date) {
+    font-size: 0.6875rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    order: 3;
+    margin-left: auto;
+  }
+
+  .latest-notes-list :global(.note-tags) {
+    display: none !important;
   }
 
   .notebooks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .notebooks-grid :global(.notebook-card) {
+    height: 100%;
   }
 
   @media (max-width: 768px) {
+    .main-layout {
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .latest-notes-section {
+      flex: 1;
+      width: 100%;
+    }
+
+    .notebooks-section {
+      flex: 1;
+      width: 100%;
+    }
+
     .home-title {
       font-size: 2rem;
     }
@@ -70,9 +213,34 @@ const notebooks = await getAllNotebooks();
       font-size: 1rem;
     }
 
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
     .notebooks-grid {
       grid-template-columns: 1fr;
       gap: 1rem;
     }
+
+    .latest-notes-list :global(.note-content) {
+      flex-wrap: nowrap;
+      gap: 0.375rem;
+    }
+
+    .latest-notes-list :global(.note-title) {
+      font-size: 0.75rem;
+    }
+
+    .latest-notes-list :global(.note-excerpt) {
+      font-size: 0.625rem;
+    }
+
+    .latest-notes-list :global(.note-date) {
+      font-size: 0.625rem;
+      order: 3;
+      margin-left: auto;
+    }
+
   }
 </style>

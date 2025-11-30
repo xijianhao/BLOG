@@ -5,18 +5,58 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   note: CollectionEntry<'notes'>;
   notebookSlug?: string;
+  notebookIcon?: string | null;
+  notebookColor?: string | null;
 }
 
-const { note, notebookSlug } = Astro.props;
-const { title, date, tags, excerpt, icon, color } = note.data;
+const { note, notebookSlug, notebookIcon, notebookColor } = Astro.props;
+const { title, date, tags, excerpt } = note.data;
 const href = notebookSlug 
   ? `/notebooks/${notebookSlug}/${note.slug}`
   : `/notes/${note.slug}`;
+
+// 处理图标：如果是SVG，替换其中的颜色为动态颜色
+function processIcon(icon: string | null | undefined): string {
+  if (!icon) return '📚';
+  
+  // 清理多行字符串中的空白（frontmatter 中的 | 会保留换行和缩进）
+  // 规范化空白字符，但保持 SVG 结构
+  let cleanedIcon = icon.trim();
+  // 将换行和多个空格替换为单个空格
+  cleanedIcon = cleanedIcon.replace(/\s+/g, ' ').trim();
+  
+  // 如果是SVG，替换颜色为 currentColor（跟随主题色）
+  if (cleanedIcon.includes('<svg')) {
+    // 将 SVG 中的颜色替换为 currentColor，这样会跟随父元素的文本颜色（主题色）
+    let processed = cleanedIcon.replace(/(fill|stroke)=["']#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})["']/gi, `$1="currentColor"`);
+    
+    return processed;
+  }
+  
+  // 否则返回原始图标（emoji等）
+  return cleanedIcon;
+}
+
+const iconContent = processIcon(notebookIcon);
+const isSvg = iconContent.includes('<svg');
+const iconColor = notebookColor || '#6366f1';
+
 ---
 
 <a href={href} class="note-card">
   <div class="note-content">
     <div class="note-header">
+      {isSvg ? (
+        <div 
+          class="notebook-icon" 
+          style={`--notebook-color: ${iconColor}`}
+          set:html={iconContent}
+        />
+      ) : (
+        <div class="notebook-icon" style={`--notebook-color: ${iconColor}`}>
+          {iconContent}
+        </div>
+      )}
       <h3 class="note-title">{title}</h3>
       <time class="note-date" datetime={date.toISOString()}>
         {date.toLocaleDateString('zh-CN', { 
@@ -27,13 +67,6 @@ const href = notebookSlug
       </time>
     </div>
     {excerpt && <p class="note-excerpt">{excerpt}</p>}
-    {tags && tags.length > 0 && (
-      <div class="note-tags">
-        {tags.map(tag => (
-          <span class="note-tag">{tag}</span>
-        ))}
-      </div>
-    )}
   </div>
 </a>
 
@@ -84,6 +117,28 @@ const href = notebookSlug
     min-width: 0;
   }
 
+  .notebook-icon {
+    font-size: 1rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--color-bg);
+    overflow: visible;
+    color: var(--color-text-primary);
+  }
+
+  .notebook-icon svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
   .note-header {
     display: flex;
     justify-content: space-between;
@@ -97,7 +152,6 @@ const href = notebookSlug
     font-size: 1rem;
     font-weight: 600;
     color: var(--color-text-primary);
-    flex: 1;
     line-height: 1.4;
   }
 
@@ -112,23 +166,6 @@ const href = notebookSlug
     font-size: 0.8125rem;
     color: var(--color-text-secondary);
     line-height: 1.5;
-  }
-
-  .note-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .note-tag {
-    display: inline-block;
-    padding: 0.1875rem 0.625rem;
-    font-size: 0.6875rem;
-    background: var(--color-border);
-    color: var(--color-text-primary);
-    border-radius: 10px;
-    font-weight: 500;
-    border: 1px solid var(--color-border);
   }
 
   @media (max-width: 768px) {
