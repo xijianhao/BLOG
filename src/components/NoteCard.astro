@@ -38,20 +38,20 @@ const href = notebookSlug
   .note-card {
     display: block;
     padding: 1rem 1.25rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-bg);
     border-radius: 10px;
-    border: 1px solid rgba(46, 125, 50, 0.15);
+    border: 1px solid var(--color-border);
     text-decoration: none;
     color: inherit;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.08);
+    box-shadow: 0 2px 4px rgba(89, 56, 44, 0.1);
   }
 
   .note-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.15);
-    border-color: rgba(46, 125, 50, 0.3);
-    background: white;
+    box-shadow: 0 6px 16px rgba(89, 56, 44, 0.2);
+    border-color: var(--color-text-secondary);
+    background: var(--color-border);
   }
 
   .note-header {
@@ -66,21 +66,21 @@ const href = notebookSlug
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: #2e7d32;
+    color: var(--color-text-primary);
     flex: 1;
     line-height: 1.4;
   }
 
   .note-date {
     font-size: 0.8125rem;
-    color: #66bb6a;
+    color: var(--color-text-secondary);
     white-space: nowrap;
   }
 
   .note-excerpt {
     margin: 0 0 0.75rem 0;
     font-size: 0.8125rem;
-    color: #558b2f;
+    color: var(--color-text-secondary);
     line-height: 1.5;
   }
 
@@ -94,11 +94,11 @@ const href = notebookSlug
     display: inline-block;
     padding: 0.1875rem 0.625rem;
     font-size: 0.6875rem;
-    background: rgba(200, 230, 201, 0.6);
-    color: #2e7d32;
+    background: var(--color-border);
+    color: var(--color-text-primary);
     border-radius: 10px;
     font-weight: 500;
-    border: 1px solid rgba(46, 125, 50, 0.15);
+    border: 1px solid var(--color-border);
   }
 
   @media (max-width: 768px) {

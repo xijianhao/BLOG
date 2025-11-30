@@ -1,5 +1,6 @@
 ---
 import SearchBox from '../components/SearchBox.astro';
+import Theme from '../components/Theme.astro';
 
 interface Props {
   title?: string;
@@ -18,15 +19,58 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <script is:inline>
+      // 立即应用主题，避免闪烁
+      (function() {
+        const themes = {
+          'ponkotsu-house': {
+            bg: '#F2F2F2',
+            border: '#D9D4CC',
+            textPrimary: '#59382C',
+            textSecondary: '#8C5B49',
+          },
+          'ocean': {
+            bg: '#E8F4F8',
+            border: '#B8D4E3',
+            textPrimary: '#1A4D5C',
+            textSecondary: '#2D6A7F',
+          },
+          'forest': {
+            bg: '#F0F5E8',
+            border: '#C8D9B0',
+            textPrimary: '#2D4A1F',
+            textSecondary: '#4A6B3A',
+          },
+          'sunset': {
+            bg: '#FFF5E6',
+            border: '#FFD4A3',
+            textPrimary: '#8B4513',
+            textSecondary: '#CD853F',
+          },
+        };
+
+        const savedThemeId = localStorage.getItem('theme-id') || 'ponkotsu-house';
+        const theme = themes[savedThemeId] || themes['ponkotsu-house'];
+        
+        if (theme) {
+          const root = document.documentElement;
+          root.style.setProperty('--color-bg', theme.bg);
+          root.style.setProperty('--color-border', theme.border);
+          root.style.setProperty('--color-text-primary', theme.textPrimary);
+          root.style.setProperty('--color-text-secondary', theme.textSecondary);
+        }
+      })();
+    </script>
   </head>
   <body>
     <header class="header">
       <div class="header-container">
         <a href="/" class="header-logo">
-          <span class="logo-icon">📚</span>
-          <span class="logo-text">知识库</span>
+          <span class="logo-icon"></span>
+          <span class="logo-text">席剑豪</span>
         </a>
         <SearchBox />
+        <Theme />
       </div>
     </header>
     <main class="main">
@@ -39,6 +83,14 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
 </html>
 
 <style is:global>
+  :root {
+    /* 主题颜色变量 */
+    --color-bg: #F2F2F2;
+    --color-border: #D9D4CC;
+    --color-text-primary: #59382C;
+    --color-text-secondary: #8C5B49;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
@@ -54,20 +106,19 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
   }
 
   body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: var(--color-bg);
     min-height: 100vh;
-    color: #e0e0e0;
+    color: var(--color-text-primary);
     line-height: 1.6;
   }
 
   .header {
-    background: rgba(26, 26, 46, 0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 3px rgba(89, 56, 44, 0.1);
   }
 
   .header-container {
@@ -76,7 +127,12 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     padding: 0.75rem 2rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
+  }
+
+  .header-container > :global(.theme-container) {
+    margin-left: auto;
   }
 
   .header-logo {
@@ -84,7 +140,7 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     align-items: center;
     gap: 0.625rem;
     text-decoration: none;
-    color: #e0e0e0;
+    color: var(--color-text-primary);
     font-size: 1.125rem;
     font-weight: 600;
     flex-shrink: 0;
@@ -104,7 +160,7 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
   .footer {
     text-align: center;
     padding: 2rem;
-    color: rgba(224, 224, 224, 0.6);
+    color: var(--color-text-secondary);
     font-size: 0.875rem;
   }
 

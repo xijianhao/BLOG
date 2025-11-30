@@ -23,9 +23,7 @@ const { title, description, icon, color } = notebook.data;
     <div class="notebook-header">
       <a href="/" class="back-link">← 返回首页</a>
       <div class="notebook-info">
-        <div class="notebook-icon-large" style={`--notebook-color: ${color || '#6366f1'}`}>
-          {icon || '📚'}
-        </div>
+       
         <h1 class="notebook-title">{title}</h1>
       </div>
     </div>
@@ -70,12 +68,19 @@ const { title, description, icon, color } = notebook.data;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #2e7d32;
+    color: var(--color-text-primary);
     text-decoration: none;
     font-size: 1rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-bg);
     font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+  }
+
+  .back-link:hover {
+    background: var(--color-border);
+    color: var(--color-text-primary);
   }
 
   .notebook-header {
@@ -83,10 +88,10 @@ const { title, description, icon, color } = notebook.data;
     display: flex;
     align-items: center;
     position: relative;
-    background: white;
+    background: var(--color-bg);
     border-radius: 8px;
-    border: 1px solid rgba(46, 125, 50, 0.15);
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px rgba(89, 56, 44, 0.15);
     overflow: hidden;
     padding: 0.5rem;
   }
@@ -100,23 +105,19 @@ const { title, description, icon, color } = notebook.data;
     transform: translateX(-50%);
   }
 
-  .notebook-icon-large {
-    font-size: 2rem;
-    margin-right: 0.5rem;
-  }
 
   .notebook-title {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #2e7d32;
+    color: var(--color-text-primary);
   }
 
   .notes-section {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-bg);
     padding: 1.25rem;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
-    border: 1px solid rgba(46, 125, 50, 0.15);
+    box-shadow: 0 4px 12px rgba(89, 56, 44, 0.15);
+    border: 1px solid var(--color-border);
   }
 
   .notes-header {
@@ -125,23 +126,23 @@ const { title, description, icon, color } = notebook.data;
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #f3f4f6;
+    border-bottom: 2px solid var(--color-border);
   }
 
   .notes-title {
     font-size: 1.375rem;
     font-weight: 600;
-    color: #2e7d32;
+    color: var(--color-text-primary);
     margin: 0;
   }
 
   .notes-count {
     font-size: 0.8125rem;
-    color: #558b2f;
-    background: rgba(200, 230, 201, 0.5);
+    color: var(--color-text-primary);
+    background: var(--color-border);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
-    border: 1px solid rgba(46, 125, 50, 0.2);
+    border: 1px solid var(--color-border);
   }
 
   .notes-grid {
@@ -153,19 +154,13 @@ const { title, description, icon, color } = notebook.data;
   .empty-state {
     text-align: center;
     padding: 3rem;
-    color: #9ca3af;
+    color: var(--color-text-secondary);
   }
 
   @media (max-width: 768px) {
     .notebook-info {
       flex-direction: column;
       text-align: center;
-    }
-
-    .notebook-icon-large {
-      width: 80px;
-      height: 80px;
-      font-size: 3rem;
     }
 
     .notebook-title {

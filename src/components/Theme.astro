@@ -1,0 +1,334 @@
+---
+// 定义多个主题
+const themes = [
+  {
+    id: 'ponkotsu-house',
+    name: 'Ponkotsu House',
+    colors: {
+      bg: '#F2F2F2',
+      border: '#D9D4CC',
+      textPrimary: '#59382C',
+      textSecondary: '#8C5B49',
+    },
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    colors: {
+      bg: '#E8F4F8',
+      border: '#B8D4E3',
+      textPrimary: '#1A4D5C',
+      textSecondary: '#2D6A7F',
+    },
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    colors: {
+      bg: '#F0F5E8',
+      border: '#C8D9B0',
+      textPrimary: '#2D4A1F',
+      textSecondary: '#4A6B3A',
+    },
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    colors: {
+      bg: '#FFF5E6',
+      border: '#FFD4A3',
+      textPrimary: '#8B4513',
+      textSecondary: '#CD853F',
+    },
+  },
+];
+---
+
+<div class="theme-container">
+  <button class="theme-button" id="theme-button" aria-label="切换主题1">
+    <div class="theme-preview">
+      <div class="color-block" style="background: var(--color-bg)"></div>
+      <div class="color-block" style="background: var(--color-border)"></div>
+      <div class="color-block" style="background: var(--color-text-primary)"></div>
+      <div class="color-block" style="background: var(--color-text-secondary)"></div>
+    </div>
+  </button>
+  <div class="theme-dropdown" id="theme-dropdown">
+    {themes.map((theme) => (
+      <button
+        class="theme-option"
+        data-theme-id={theme.id}
+        data-theme-colors={JSON.stringify(theme.colors)}
+      >
+        <div class="theme-option-preview">
+          <div class="color-block" style={`background: ${theme.colors.bg}`}></div>
+          <div class="color-block" style={`background: ${theme.colors.border}`}></div>
+          <div class="color-block" style={`background: ${theme.colors.textPrimary}`}></div>
+          <div class="color-block" style={`background: ${theme.colors.textSecondary}`}></div>
+        </div>
+        <span class="theme-option-name">{theme.name}</span>
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  const themes = [
+    {
+      id: 'ponkotsu-house',
+      name: 'Ponkotsu House',
+      colors: {
+        bg: '#F2F2F2',
+        border: '#D9D4CC',
+        textPrimary: '#59382C',
+        textSecondary: '#8C5B49',
+      },
+    },
+    {
+      id: 'ocean',
+      name: 'Ocean',
+      colors: {
+        bg: '#E8F4F8',
+        border: '#B8D4E3',
+        textPrimary: '#1A4D5C',
+        textSecondary: '#2D6A7F',
+      },
+    },
+    {
+      id: 'forest',
+      name: 'Forest',
+      colors: {
+        bg: '#F0F5E8',
+        border: '#C8D9B0',
+        textPrimary: '#2D4A1F',
+        textSecondary: '#4A6B3A',
+      },
+    },
+    {
+      id: 'sunset',
+      name: 'Sunset',
+      colors: {
+        bg: '#FFF5E6',
+        border: '#FFD4A3',
+        textPrimary: '#8B4513',
+        textSecondary: '#CD853F',
+      },
+    },
+  ];
+
+  const themeButton = document.getElementById('theme-button');
+  const themeDropdown = document.getElementById('theme-dropdown');
+  const themeOptions = document.querySelectorAll('.theme-option');
+  const themeContainer = document.querySelector('.theme-container');
+
+  // 从 localStorage 加载保存的主题
+  function loadTheme() {
+    const savedThemeId = localStorage.getItem('theme-id') || 'ponkotsu-house';
+    const theme = themes.find((t) => t.id === savedThemeId) || themes[0];
+    applyTheme(theme);
+  }
+
+  // 应用主题
+  function applyTheme(theme: { id: string; colors: { bg: string; border: string; textPrimary: string; textSecondary: string } }) {
+    const root = document.documentElement;
+    root.style.setProperty('--color-bg', theme.colors.bg);
+    root.style.setProperty('--color-border', theme.colors.border);
+    root.style.setProperty('--color-text-primary', theme.colors.textPrimary);
+    root.style.setProperty('--color-text-secondary', theme.colors.textSecondary);
+    
+    // 更新按钮预览
+    const preview = themeButton?.querySelector('.theme-preview');
+    if (preview) {
+      const colorBlocks = preview.querySelectorAll('.color-block');
+      const colors = [
+        theme.colors.bg,
+        theme.colors.border,
+        theme.colors.textPrimary,
+        theme.colors.textSecondary,
+      ];
+      colorBlocks.forEach((block, index) => {
+        if (colors[index]) {
+          (block as HTMLElement).style.background = colors[index];
+        }
+      });
+    }
+    
+    // 保存到 localStorage
+    localStorage.setItem('theme-id', theme.id);
+    
+    // 更新选中状态
+    themeOptions.forEach((option) => {
+      const themeId = option.getAttribute('data-theme-id');
+      option.classList.toggle('active', themeId === theme.id);
+    });
+  }
+
+  // 切换下拉菜单显示
+  function toggleDropdown() {
+    themeDropdown?.classList.toggle('active');
+  }
+
+  // 点击按钮切换下拉菜单
+  themeButton?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleDropdown();
+  });
+
+  // 点击主题选项
+  themeOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+      const themeId = option.getAttribute('data-theme-id');
+      const theme = themes.find((t) => t.id === themeId);
+      if (theme) {
+        applyTheme(theme);
+        toggleDropdown();
+      }
+    });
+  });
+
+  // 点击外部关闭下拉菜单
+  document.addEventListener('click', (e) => {
+    const target = e.target as Node;
+    if (themeContainer && !themeContainer.contains(target)) {
+      themeDropdown?.classList.remove('active');
+    }
+  });
+
+  // 页面加载时应用保存的主题
+  loadTheme();
+</script>
+
+<style>
+  .theme-container {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .theme-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 32px;
+    padding: 0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(89, 56, 44, 0.1);
+  }
+
+  .theme-button:hover {
+    background: var(--color-border);
+    box-shadow: 0 2px 4px rgba(89, 56, 44, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .theme-button:active {
+    transform: translateY(0);
+  }
+
+  .theme-preview {
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+  }
+
+  .color-block {
+    flex: 1;
+    height: 100%;
+    border-radius: 2px;
+    width: 25%;
+  }
+
+  .theme-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 
+      0 10px 25px -5px rgba(89, 56, 44, 0.2),
+      0 5px 10px -5px rgba(89, 56, 44, 0.1);
+    min-width: 180px;
+    padding: 0.5rem;
+    display: none;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+  }
+
+  .theme-dropdown.active {
+    display: block;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .theme-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.625rem;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+
+  .theme-option:hover {
+    background: var(--color-border);
+  }
+
+  .theme-option.active {
+    background: var(--color-border);
+    box-shadow: inset 0 0 0 2px var(--color-text-secondary);
+  }
+
+  .theme-option-preview {
+    display: flex;
+    gap: 2px;
+    width: 32px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .theme-option-preview .color-block {
+    flex: 1;
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .theme-option-name {
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .theme-button {
+      width: 40px;
+      height: 28px;
+    }
+
+    .theme-dropdown {
+      right: 0;
+      min-width: 160px;
+    }
+  }
+</style>
+

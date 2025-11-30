@@ -26,20 +26,20 @@ const { title, description, icon, color } = notebook.data;
     align-items: center;
     gap: 1rem;
     padding: 1.25rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-bg);
     border-radius: 12px;
-    border: 1px solid rgba(46, 125, 50, 0.15);
+    border: 1px solid var(--color-border);
     text-decoration: none;
     color: inherit;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+    box-shadow: 0 2px 6px rgba(89, 56, 44, 0.1);
   }
 
   .notebook-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.18);
-    border-color: rgba(46, 125, 50, 0.3);
-    background: white;
+    box-shadow: 0 6px 16px rgba(89, 56, 44, 0.2);
+    border-color: var(--color-text-secondary);
+    background: var(--color-border);
   }
 
   .notebook-icon {
@@ -49,7 +49,6 @@ const { title, description, icon, color } = notebook.data;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--notebook-color, #6366f1) 0%, color-mix(in srgb, var(--notebook-color, #6366f1) 80%, transparent) 100%);
     border-radius: 12px;
     flex-shrink: 0;
   }
@@ -63,25 +62,25 @@ const { title, description, icon, color } = notebook.data;
     margin: 0 0 0.5rem 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text-primary);
   }
 
   .notebook-description {
     margin: 0;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-secondary);
     line-height: 1.5;
   }
 
   .notebook-arrow {
     font-size: 1.5rem;
-    color: #9ca3af;
+    color: var(--color-text-secondary);
     transition: transform 0.2s ease;
   }
 
   .notebook-card:hover .notebook-arrow {
     transform: translateX(4px);
-    color: var(--notebook-color, #6366f1);
+    color: var(--color-text-primary);
   }
 
   @media (max-width: 768px) {
