@@ -24,6 +24,17 @@ function processIcon(icon: string | null | undefined, color: string | null | und
     // 将 SVG 中的颜色替换为 currentColor，这样会跟随父元素的文本颜色（主题色）
     let processed = cleanedIcon.replace(/(fill|stroke)=["']#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})["']/gi, `$1="currentColor"`);
     
+    // 确保SVG有必要的移动端兼容属性
+    // 如果没有preserveAspectRatio，添加它以确保正确的缩放
+    if (!processed.includes('preserveAspectRatio')) {
+      processed = processed.replace(/<svg([^>]*)>/, '<svg$1 preserveAspectRatio="xMidYMid meet">');
+    }
+    
+    // 确保有xmlns属性（移动端浏览器需要）
+    if (!processed.includes('xmlns=')) {
+      processed = processed.replace(/<svg([^>]*)>/, '<svg$1 xmlns="http://www.w3.org/2000/svg">');
+    }
+    
     return processed;
   }
   
@@ -115,6 +126,13 @@ const isSvg = iconContent.includes('<svg');
     display: block !important;
     flex-shrink: 0;
     box-sizing: border-box;
+    /* 确保移动端正确渲染 */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* 防止SVG在某些移动浏览器中不显示 */
+    visibility: visible;
+    opacity: 1;
   }
 
   .notebook-content {
@@ -175,6 +193,14 @@ const isSvg = iconContent.includes('<svg');
       width: 48px;
       height: 48px;
       font-size: 2rem;
+    }
+
+    .notebook-icon svg {
+      /* 移动端确保SVG正确显示 */
+      width: 100% !important;
+      height: 100% !important;
+      min-width: 0;
+      min-height: 0;
     }
 
     .notebook-title {

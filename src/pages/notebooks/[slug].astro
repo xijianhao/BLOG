@@ -20,7 +20,7 @@ const { title, description, icon, color } = notebook.data;
 <Layout title={`${title} - 知识库`} description={description || undefined}>
   <div class="notebook-page">
     <div class="notebook-header">
-      <a href="/" class="back-link">← 返回首页</a>
+      <a href="/" class="back-link">←</a>
       <div class="notebook-info">
        
         <h1 class="notebook-title">{title}</h1>
@@ -102,8 +102,9 @@ const { title, description, icon, color } = notebook.data;
     padding: 0.5rem 1rem;
     background: var(--color-bg);
     font-weight: 500;
-    border-radius: 6px;
-    border: 1px solid var(--color-border);
+    border-right: 9px;
+    /* border-radius: 6px; */
+    /* border: 1px solid var(--color-border); */
   }
 
   .back-link:hover {
