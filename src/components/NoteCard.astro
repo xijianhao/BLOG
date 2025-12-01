@@ -10,46 +10,58 @@ interface Props {
 }
 
 const { note, notebookSlug, notebookIcon, notebookColor } = Astro.props;
+
 const { title, date, tags, excerpt } = note.data;
 const href = notebookSlug 
   ? `/notebooks/${notebookSlug}/${note.slug}`
   : `/notes/${note.slug}`;
 
-// 处理图标：如果是SVG，替换其中的颜色为动态颜色
-function processIcon(icon: string | null | undefined): string {
-  if (!icon) return '📚';
+// 处理图标：解析 SVG 或返回 emoji
+function parseIcon(icon: string | null | undefined): { isSvg: boolean; svgContent: string | null; emoji: string } {
+  if (!icon) return { isSvg: false, svgContent: null, emoji: '📚' };
   
-  // 清理多行字符串中的空白（frontmatter 中的 | 会保留换行和缩进）
-  // 规范化空白字符，但保持 SVG 结构
-  let cleanedIcon = icon.trim();
-  // 将换行和多个空格替换为单个空格
-  cleanedIcon = cleanedIcon.replace(/\s+/g, ' ').trim();
+  // 清理多行字符串中的空白
+  let cleanedIcon = icon.trim().replace(/\s+/g, ' ').trim();
   
-  // 如果是SVG，替换颜色为 currentColor（跟随主题色）
+  // 如果是SVG，提取内容并处理
   if (cleanedIcon.includes('<svg')) {
-    // 将 SVG 中的颜色替换为 currentColor，这样会跟随父元素的文本颜色（主题色）
-    let processed = cleanedIcon.replace(/(fill|stroke)=["']#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})["']/gi, `$1="currentColor"`);
-    
-    // 确保SVG有必要的移动端兼容属性
-    // 如果没有preserveAspectRatio，添加它以确保正确的缩放
-    if (!processed.includes('preserveAspectRatio')) {
-      processed = processed.replace(/<svg([^>]*)>/, '<svg$1 preserveAspectRatio="xMidYMid meet">');
+    // 提取 SVG 标签内的所有内容
+    const svgMatch = cleanedIcon.match(/<svg([^>]*)>(.*?)<\/svg>/s);
+    if (svgMatch) {
+      let svgAttrs = svgMatch[1];
+      let svgInner = svgMatch[2];
+      
+      // 替换颜色为 currentColor
+      svgInner = svgInner.replace(/(fill|stroke)=["']#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})["']/gi, `$1="currentColor"`);
+      
+      // 确保有必要的属性（移动端兼容性）
+      if (!svgAttrs.includes('xmlns=')) {
+        svgAttrs += ' xmlns="http://www.w3.org/2000/svg"';
+      }
+      if (!svgAttrs.includes('viewBox') && !svgAttrs.includes('width')) {
+        svgAttrs += ' viewBox="0 0 24 24"';
+      }
+      if (!svgAttrs.includes('preserveAspectRatio')) {
+        svgAttrs += ' preserveAspectRatio="xMidYMid meet"';
+      }
+      // 移动端特定：添加明确的尺寸属性
+      if (!svgAttrs.includes('width=')) {
+        svgAttrs += ' width="24" height="24"';
+      }
+      
+      return {
+        isSvg: true,
+        svgContent: `<svg${svgAttrs}>${svgInner}</svg>`,
+        emoji: ''
+      };
     }
-    
-    // 确保有xmlns属性（移动端浏览器需要）
-    if (!processed.includes('xmlns=')) {
-      processed = processed.replace(/<svg([^>]*)>/, '<svg$1 xmlns="http://www.w3.org/2000/svg">');
-    }
-    
-    return processed;
   }
   
   // 否则返回原始图标（emoji等）
-  return cleanedIcon;
+  return { isSvg: false, svgContent: null, emoji: cleanedIcon };
 }
 
-const iconContent = processIcon(notebookIcon);
-const isSvg = iconContent.includes('<svg');
+const iconData = parseIcon(notebookIcon);
 const iconColor = notebookColor || '#6366f1';
 
 ---
@@ -57,15 +69,16 @@ const iconColor = notebookColor || '#6366f1';
 <a href={href} class="note-card">
   <div class="note-content">
     <div class="note-header">
-      {isSvg ? (
+      {iconData.isSvg ? (
         <div 
           class="notebook-icon" 
           style={`--notebook-color: ${iconColor}`}
-          set:html={iconContent}
+          set:html={iconData.svgContent}
+          aria-hidden="true"
         />
       ) : (
         <div class="notebook-icon" style={`--notebook-color: ${iconColor}`}>
-          {iconContent}
+          {iconData.emoji}
         </div>
       )}
       <h3 class="note-title">{title}</h3>
@@ -140,6 +153,13 @@ const iconColor = notebookColor || '#6366f1';
     background: var(--color-bg);
     overflow: visible;
     color: var(--color-text-primary);
+    /* 确保移动端容器正确显示 */
+    position: relative;
+    min-width: 20px;
+    min-height: 20px;
+    /* 移动端特定修复：确保容器可见 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .notebook-icon svg {
@@ -153,8 +173,16 @@ const iconColor = notebookColor || '#6366f1';
     max-height: 100%;
     object-fit: contain;
     /* 防止SVG在某些移动浏览器中不显示 */
-    visibility: visible;
-    opacity: 1;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* 确保 SVG 在移动端可见 */
+    position: relative;
+    z-index: 1;
+    /* 移动端特定修复：强制硬件加速 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* 确保 SVG 内容可见 */
+    pointer-events: none;
   }
 
   .note-header {
