@@ -178,27 +178,6 @@ const { title, description, icon, color } = notebook.data;
     display: flex;
     flex-direction: column;
     gap: 0;
-    max-height: calc(100vh - 300px);
-    overflow-y: auto;
-    scroll-behavior: smooth;
-  }
-
-  .notes-list::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .notes-list::-webkit-scrollbar-track {
-    background: var(--color-bg);
-    border-radius: 4px;
-  }
-
-  .notes-list::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 4px;
-  }
-
-  .notes-list::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-secondary);
   }
 
   .note-item {
@@ -310,10 +289,6 @@ const { title, description, icon, color } = notebook.data;
 
     .notes-section {
       padding: 1.5rem;
-    }
-
-    .notes-list {
-      max-height: calc(100vh - 250px);
     }
 
     .note-item {

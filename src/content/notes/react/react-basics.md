@@ -1,5 +1,5 @@
 ---
-title: React 基础
+title: 基础
 notebook: react
 date: 2024-11-29
 tags: ['react', '基础', '概念']
