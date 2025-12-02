@@ -4,7 +4,7 @@ notebook: react
 date: 2025-03-23
 tags: ['react', '基础', 'hooks']
 excerpt: 总结两个副作用本质的区别
-order: 3
+order: 7
 ---
 
 # useEffect
