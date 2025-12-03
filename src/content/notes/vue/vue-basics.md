@@ -20,3 +20,17 @@ order: 0
 **单向数据流:** Vue遵循单向数据流、父传子通过props，子改父组件通过事件emit，保证数据流动的可预测性。同时vue3的compositon APi，通过setup 能让我们在函数式风格中更灵活的组织逻辑、复用状态和副作用，类似React Hooks，但保留了模板的直观性。
 
 还有Vue的生命周期钩子、自定义指令、插槽、全剧状态管理、路由系统等，构成了一个完整的前端开发生态。
+
+# MVVM核心概念
+
+MVVM是一种架构模式，有三个核心组件，Model - View - ViewModel 它将用户界面与业务逻辑分离，通过数据绑定实现View和Model之间的自动同步
+
+**Model** 数据模型层 - 代表应用数据和业务逻辑 不引用View 或 ViewModel,可包含数据验证、计算等纯业务逻辑
+
+**View** 视图层 - 纯UI展示和用户交互 通过声明式绑定链接到ViewModel 尽量不包含业务逻辑
+
+**ViewModel** 视图模型层 - 相当于中间层，持有View的当前状态，定义View的交互逻辑，将Model数据转为适合View展示的格式，隔离View和Model的直接依赖。
+
+![MVVM架构图](../../../assets/vue/mvvm.svg)
+
+
