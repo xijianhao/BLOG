@@ -1,6 +1,7 @@
 ---
 import SearchBox from '../components/SearchBox.astro';
 import Theme from '../components/Theme.astro';
+import Analytics from '@vercel/analytics/astro'
 
 interface Props {
   title?: string;
@@ -97,6 +98,7 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     </header>
     <main class="main">
       <slot />
+      <Analytics />
     </main>
     <footer class="footer">
       <p>© 2025 知识库 - 记录学习与生活</p>
