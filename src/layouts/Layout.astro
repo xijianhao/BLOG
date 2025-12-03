@@ -20,6 +20,7 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <Analytics />
     <script is:inline>
       // 立即应用主题，避免闪烁
       (function() {
@@ -98,7 +99,6 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
     </header>
     <main class="main">
       <slot />
-      <Analytics />
     </main>
     <footer class="footer">
       <p>© 2025 知识库 - 记录学习与生活</p>
