@@ -62,34 +62,42 @@ async/await 本质上是 Promise 的语法糖，执行机制如下：
 - await 后面的代码会被包装成微任务，放入微任务队列
 - 函数执行到 await 时，会先执行 await 后面的表达式，然后将后续代码作为微任务
 
-```javascript
-async function test() {
-  console.log(1);
-  await Promise.resolve();
-  console.log(2); // 这部分会作为微任务
-}
-console.log(3);
-test();
-console.log(4);
-// 输出顺序：3, 1, 4, 2
-```
 
-# 执行顺序示例
+# 示例1
 
 ```javascript
-console.log('1'); // 同步代码
+console.log(1); // 同步
 
 setTimeout(() => {
-  console.log('2'); // 宏任务
+  console.log(2); // 宏任务
+  Promise.resolve().then(() => console.log(3));
 }, 0);
 
-Promise.resolve().then(() => {
-  console.log('3'); // 微任务
+async function async1() {
+  console.log(4);
+  await async2();
+  console.log(5); // 单独的延时微任务队列，当执行完所有的微任务队列后执行
+}
+
+async function async2() {
+  console.log(6);
+  return Promise.resolve().then(() => console.log(7));
+}
+
+async1();
+
+queueMicrotask(() => {
+  console.log(8);
+  Promise.resolve().then(() => console.log(9));
 });
 
-console.log('4'); // 同步代码
+new Promise(resolve => {
+  console.log(10);
+  resolve();
+}).then(() => console.log(11));
 
-// 输出顺序：1, 4, 3, 2
-// 解释：同步代码先执行(1,4)，然后执行微任务(3)，最后执行宏任务(2)
+console.log(12);
+
+// 1,4,6,10,12,7,8,11,9,5,2,3
 ```
 
