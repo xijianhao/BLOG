@@ -6,7 +6,7 @@ tags: ['基础']
 excerpt: JS事件循环机制：调用栈、宏任务队列、微任务队列的执行流程与原理
 order: 1
 ---
-
+A F,[C,G][B ]
 
 # 背景
 
@@ -28,7 +28,7 @@ order: 1
 	- UI 渲染（浏览器环境）
 	- 整体 script 脚本
 	- setImmediate（Node.js 环境）
-	- MessageChannel
+	- MessageChannel 高优先级 setTimeout
 
 ## 微任务队列
 	存放微任务回调，常见的微任务包括：
@@ -38,6 +38,7 @@ order: 1
 	- MutationObserver（浏览器环境）
 	- process.nextTick（Node.js 环境，优先级最高）
 
+start end promise1,micro1,promise2  promise3  raf1 p3 message1 p2 timeout1 p1 timeout2 p3 
 
 # 执行流程
 
@@ -101,3 +102,42 @@ console.log(12);
 // 1,4,6,10,12,7,8,11,9,5,2,3
 ```
 
+# 示例2
+
+``` javascript
+async function foo() {
+  console.log(1);
+  await bar();
+  console.log(2);
+}
+
+async function bar() {
+  console.log(3);
+  return Promise.resolve().then(() => {
+    console.log(4);
+  });
+}
+
+console.log(5);
+
+Promise.resolve()
+  .then(() => {
+    console.log(6);
+    return Promise.resolve().then(() => console.log(7));
+  })
+  .then(() => console.log(8));
+
+foo();
+
+queueMicrotask(() => console.log(9));
+
+new Promise((resolve) => {
+  console.log(10);
+  resolve();
+}).then(() => console.log(11));
+
+setTimeout(() => console.log(12), 0);
+
+console.log(13);
+// 5，1，3，10，13，6，4，9，11，7，2，8，12
+```
