@@ -8,7 +8,7 @@ interface Props {
   description?: string;
 }
 
-const { title = '知识库', description = '我的个人知识库' } = Astro.props;
+const { title = 'KeGoLog', description = 'KEGO NOTES - Record learning and life' } = Astro.props;
 ---
 
 <!doctype html> 
@@ -74,6 +74,18 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
         <div class="header-right">
           <nav class="social-links">
             <a 
+              href="https://keepgoing.top" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="KeepGoing"
+            >
+              <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </a>
+            <a 
               href="https://github.com/xijianhao" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -85,12 +97,9 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
               </svg>
              
             </a>
-            <!-- 后续可以在这里添加更多社交链接 -->
-            <!-- 
-            <a href="#" class="social-link" aria-label="微信">微信图标</a>
-            <a href="#" class="social-link" aria-label="小程序">小程序图标</a>
-            <a href="#" class="social-link" aria-label="小红书">小红书图标</a>
-            -->
+            
+            <!-- <a href="#" class="social-link" aria-label="小程序">小程序图标</a>
+            <a href="#" class="social-link" aria-label="小红书">小红书图标</a> -->
           </nav>
           <Theme />
         </div>
@@ -101,7 +110,7 @@ const { title = '知识库', description = '我的个人知识库' } = Astro.pro
       <Analytics />
     </main>
     <footer class="footer">
-      <p>© 2025 知识库 - 记录学习与生活</p>
+      <p>© 2025 KeGoLog - Record learning and life</p>
     </footer>
   </body>
 </html>

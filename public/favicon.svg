@@ -1,25 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <!-- 侧面兔子 - GitHub Octocat风格 -->
-  <g stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <!-- 头部（圆形） -->
-    <circle cx="40" cy="55" r="18" />
-    
-    <!-- 耳朵（三角形风格） -->
-    <path d="M 28 45 Q 20 25 15 30 Q 12 35 20 50" />
-    
-    <!-- 身体（椭圆形） -->
-    <ellipse cx="65" cy="85" rx="22" ry="28" />
-    
-    <!-- 前腿 -->
-    <path d="M 50 90 Q 45 100 50 110" />
-    
-    <!-- 后腿（更圆润） -->
-    <path d="M 75 95 Q 82 105 78 115 Q 74 120 70 115" />
-    
-    <!-- 尾巴（圆润的曲线） -->
-    <path d="M 85 85 Q 95 75 98 85 Q 95 95 88 92" />
-    
-    <!-- 背部连接线 -->
-    <path d="M 52 70 Q 58 75 65 80" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- 背景矩形 -->
+  <rect width="24" height="24" rx="5" opacity="0.25"/>
+  
+  <!-- 左侧书页 -->
+  <rect x="5" y="6" width="7" height="12" rx="1" stroke="#4A90E2" stroke-width="1.5" fill="none"/>
+  
+  <!-- 右侧书页 -->
+  <rect x="12" y="6" width="7" height="12" rx="1" stroke="#4A90E2" stroke-width="1.5" fill="none"/>
+  
+  <!-- 中间书脊线 -->
+  <line x1="12" y1="6" x2="12" y2="18" stroke="#4A90E2" stroke-width="1.5"/>
+  
+  <!-- 文字线条（左侧） -->
+  <line x1="7" y1="9.5" x2="10" y2="9.5" stroke="#4A90E2" stroke-width="1.2"/>
+  <line x1="7" y1="11.5" x2="10" y2="11.5" stroke="#4A90E2" stroke-width="1.2"/>
+  <line x1="7" y1="13.5" x2="9.5" y2="13.5" stroke="#4A90E2" stroke-width="1.2"/>
+  
+  <!-- 文字线条（右侧） -->
+  <line x1="14" y1="9.5" x2="17" y2="9.5" stroke="#4A90E2" stroke-width="1.2"/>
+  <line x1="14" y1="11.5" x2="17" y2="11.5" stroke="#4A90E2" stroke-width="1.2"/>
+  <line x1="14" y1="13.5" x2="16.5" y2="13.5" stroke="#4A90E2" stroke-width="1.2"/>
 </svg>

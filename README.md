@@ -1,4 +1,4 @@
-# 📚 知识库
+# 📚 KeGoLog
 
 一个基于 Astro 构建的个人知识库系统，用于管理和展示各种类型的笔记。
 
@@ -114,15 +114,3 @@ order: 1
 - 🖖 **Vue** - Vue.js 框架学习笔记
 - 📜 **JavaScript** - JavaScript 核心知识
 - 🍳 **做饭** - 美食制作和烹饪技巧
-
-## 🛠️ 技术栈
-
-- [Astro](https://astro.build) - 静态站点生成器
-- [Content Collections](https://docs.astro.build/en/guides/content-collections/) - 内容管理
-- TypeScript - 类型安全
-- Markdown - 笔记格式
-
-## 📖 了解更多
-
-- [Astro 文档](https://docs.astro.build)
-- [Content Collections 指南](https://docs.astro.build/en/guides/content-collections/)
