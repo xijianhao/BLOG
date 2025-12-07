@@ -165,7 +165,20 @@ const themes = [
 
   // 切换下拉菜单显示
   function toggleDropdown() {
-    themeDropdown?.classList.toggle('active');
+    const isActive = themeDropdown?.classList.toggle('active');
+    
+    // 在移动端使用 fixed 定位
+    if (isActive && window.innerWidth <= 768 && themeButton && themeDropdown) {
+      const buttonRect = themeButton.getBoundingClientRect();
+      themeDropdown.style.position = 'fixed';
+      themeDropdown.style.top = `${buttonRect.bottom + 8}px`;
+      themeDropdown.style.right = `${window.innerWidth - buttonRect.right}px`;
+    } else if (themeDropdown) {
+      // 恢复默认定位
+      themeDropdown.style.position = '';
+      themeDropdown.style.top = '';
+      themeDropdown.style.right = '';
+    }
   }
 
   // 点击按钮切换下拉菜单
@@ -182,6 +195,12 @@ const themes = [
       if (theme) {
         applyTheme(theme);
         toggleDropdown();
+        // 关闭后重置定位样式
+        if (themeDropdown && !themeDropdown.classList.contains('active')) {
+          themeDropdown.style.position = '';
+          themeDropdown.style.top = '';
+          themeDropdown.style.right = '';
+        }
       }
     });
   });
@@ -191,6 +210,22 @@ const themes = [
     const target = e.target as Node;
     if (themeContainer && !themeContainer.contains(target)) {
       themeDropdown?.classList.remove('active');
+      // 重置定位样式
+      if (themeDropdown) {
+        themeDropdown.style.position = '';
+        themeDropdown.style.top = '';
+        themeDropdown.style.right = '';
+      }
+    }
+  });
+
+  // 窗口大小变化时重新计算位置
+  window.addEventListener('resize', () => {
+    if (themeDropdown?.classList.contains('active') && window.innerWidth <= 768 && themeButton) {
+      const buttonRect = themeButton.getBoundingClientRect();
+      themeDropdown.style.position = 'fixed';
+      themeDropdown.style.top = `${buttonRect.bottom + 8}px`;
+      themeDropdown.style.right = `${window.innerWidth - buttonRect.right}px`;
     }
   });
 
@@ -257,7 +292,7 @@ const themes = [
     min-width: 180px;
     padding: 0.5rem;
     display: none;
-    z-index: 1000;
+    z-index: 10000;
     animation: slideDown 0.2s ease-out;
   }
 
@@ -320,6 +355,11 @@ const themes = [
   }
 
   @media (max-width: 768px) {
+    .theme-container {
+      position: relative;
+      z-index: 10001;
+    }
+
     .theme-button {
       width: 40px;
       height: 28px;
@@ -328,6 +368,12 @@ const themes = [
     .theme-dropdown {
       right: 0;
       min-width: 160px;
+      z-index: 10000;
+    }
+
+    /* 移动端使用 fixed 定位时 */
+    .theme-dropdown.active[style*="position: fixed"] {
+      position: fixed !important;
     }
   }
 </style>
