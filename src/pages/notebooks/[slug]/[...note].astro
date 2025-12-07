@@ -27,31 +27,14 @@ const { title, date, tags } = note.data;
 
 <Layout title={`${title} - ${notebook?.data.title || '知识库'}`}>
   <article class="note-page">
-    <nav class="note-nav">
-      <a href={`/notebooks/${notebookSlug}`} class="nav-link">
-        ← 返回 {notebook?.data.title || '笔记本'}
-      </a>
-    </nav>
-
     <header class="note-header">
+      <a href={`/notebooks/${notebookSlug}`} class="note-back-button" aria-label="返回">
+        <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </a>
       <div class="note-header-content">
         <h1 class="note-title">{title}</h1>
-        <div class="note-meta">
-          {tags && tags.length > 0 && (
-            <div class="note-tags">
-              {tags.map(tag => (
-                <span class="note-tag">{tag}</span>
-              ))}
-            </div>
-          )}
-          <time class="note-date" datetime={date.toISOString()}>
-            {date.toLocaleDateString('zh-CN', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </time>
-        </div>
       </div>
     </header>
 
@@ -77,39 +60,6 @@ const { title, date, tags } = note.data;
     }
   }
 
-  .note-nav {
-    margin-bottom: 1rem;
-  }
-
-  .nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-primary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    /* margin-bottom: 1.5rem; */
-    padding: 0.5rem 1rem;
-    background: var(--color-bg);
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
-    box-shadow: 0 1px 3px rgba(89, 56, 44, 0.1);
-  }
-
-  .nav-link:hover {
-    background: var(--color-border);
-    border-color: var(--color-text-secondary);
-    transform: translateX(-3px);
-    box-shadow: 0 2px 6px rgba(89, 56, 44, 0.2);
-    color: var(--color-text-primary);
-  }
-
-  .nav-link:active {
-    transform: translateX(-3px) scale(0.98);
-  }
-
   .note-header {
     background: var(--color-bg);
     padding: 1rem 1.25rem;
@@ -117,12 +67,50 @@ const { title, date, tags } = note.data;
     margin-bottom: 1rem;
     box-shadow: 0 4px 12px rgba(89, 56, 44, 0.15);
     border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+  }
+
+  .note-back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: 8px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(89, 56, 44, 0.1);
+  }
+
+  .note-back-button:hover {
+    background: var(--color-text-secondary);
+    color: var(--color-bg);
+    border-color: var(--color-text-secondary);
+    transform: translateX(-2px);
+    box-shadow: 0 2px 6px rgba(89, 56, 44, 0.2);
+  }
+
+  .note-back-button:active {
+    transform: translateX(-2px) scale(0.95);
+  }
+
+  .back-icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .note-header-content {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
   }
 
   .note-title {
@@ -131,41 +119,16 @@ const { title, date, tags } = note.data;
     margin: 0;
     color: var(--color-text-primary);
     line-height: 1.3;
-  }
-
-  .note-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-  }
-
-  .note-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .note-date {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    margin-left: auto;
-  }
-
-  .note-tag {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    background: var(--color-border);
-    color: var(--color-text-primary);
-    border-radius: 12px;
-    font-weight: 500;
-    border: 1px solid var(--color-border);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .note-content {
     background: var(--color-bg);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 16px;
     box-shadow: 0 4px 6px rgba(89, 56, 44, 0.1);
     line-height: 1.8;
@@ -294,22 +257,35 @@ const { title, date, tags } = note.data;
   @media (max-width: 768px) {
     .note-header {
       padding: 0.875rem 1rem;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .note-back-button {
+      width: 2.25rem;
+      height: 2.25rem;
+      flex-shrink: 0;
+    }
+
+    .back-icon {
+      width: 1.125rem;
+      height: 1.125rem;
     }
 
     .note-header-content {
-      gap: 0.75rem;
+      flex: 1;
+      min-width: 0;
     }
 
     .note-title {
-      font-size: 1.5rem;
-    }
-
-    .note-meta {
-      gap: 0.5rem;
+      font-size: 1.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .note-content {
-      padding: 1.5rem;
+      padding: 1rem;
     }
 
     .note-content :global(h1) {

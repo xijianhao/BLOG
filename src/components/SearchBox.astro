@@ -324,8 +324,21 @@ try {
 
   @media (max-width: 768px) {
     .search-container {
-      margin: 0 1rem;
+      margin: 0 0.375rem;
       max-width: 100%;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .search-input {
+      padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+      font-size: 0.8125rem;
+    }
+
+    .search-icon {
+      left: 0.5rem;
+      width: 1.125rem;
+      height: 1.125rem;
     }
 
     .search-results {
