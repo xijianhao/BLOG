@@ -12,7 +12,7 @@ order: 2
 
 SSE 全称Server-Sent Eents,  是HTML5标准的一部分，它的核心是`基于HTTP长连接的服务器单向推送技术`
 
-1. 客户端通过`EventSource`API发起一个HTTP GET请求
+1. 客户端通过`EventSource`API发起一个HTTP的GET请求
 2. 服务器响应的**ContentType**设置为**text/event-stream**
 3. 连接保持打开状态，服务器可以持续发送数据
 4. 数据格式遵循特定的文本协议，每个消息以`\n\n`结束
