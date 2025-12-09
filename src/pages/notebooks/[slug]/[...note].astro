@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { getNotebookBySlug } from '../../../utils/notebooks';
+import { TableOfContents } from '../../../components/TableOfContents';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes');
@@ -38,8 +39,11 @@ const { title, date, tags } = note.data;
       </div>
     </header>
 
-    <div class="note-content">
-      <Content />
+    <div class="note-wrapper">
+      <div class="note-content">
+        <Content />
+      </div>
+      <TableOfContents client:load />
     </div>
   </article>
 </Layout>
@@ -126,6 +130,10 @@ const { title, date, tags } = note.data;
     text-overflow: ellipsis;
   }
 
+  .note-wrapper {
+    position: relative;
+  }
+
   .note-content {
     background: var(--color-bg);
     padding: 1.5rem;
@@ -134,6 +142,18 @@ const { title, date, tags } = note.data;
     line-height: 1.8;
     color: var(--color-text-primary);
     border: 1px solid var(--color-border);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* 目录样式 */
+  .note-content :global(h1),
+  .note-content :global(h2),
+  .note-content :global(h3),
+  .note-content :global(h4),
+  .note-content :global(h5),
+  .note-content :global(h6) {
+    scroll-margin-top: 100px;
   }
 
   .note-content :global(h1),
@@ -300,6 +320,156 @@ const { title, date, tags } = note.data;
       padding: 1rem;
       font-size: 0.8125rem;
     }
+  }
+
+  /* PC 端目录悬浮样式 */
+  @media (min-width: 1024px) {
+    .note-wrapper {
+      position: relative;
+    }
+
+    .note-content {
+      /* 保持原来的宽度，不限制 */
+      width: 100%;
+      margin: 0 auto;
+      /* 确保内容不被目录遮挡，添加最小左边距 */
+      position: relative;
+      z-index: 1;
+    }
+  }
+</style>
+
+<style is:global>
+  /* 目录组件全局样式 */
+  .table-of-contents {
+    position: fixed;
+    width: 240px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(89, 56, 44, 0.1);
+    z-index: 10;
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .table-of-contents {
+      display: block;
+      /* 垂直居中：使用 top: 50% 和 transform */
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  /* 当屏幕宽度 >= 1200px 时，main 容器居中，目录放在 main 左侧 */
+  @media (min-width: 1200px) {
+    .table-of-contents {
+      /* main 左边界 = (100vw - 1200px) / 2 */
+      /* 目录宽度 240px，留出 20px 间距 */
+      /* left = (100vw - 1200px) / 2 - 260px */
+      left: calc((100vw - 1200px) / 2 - 260px);
+      /* 确保不会太靠左，最小距离左侧 1rem */
+      left: max(1rem, calc((100vw - 1200px) / 2 - 260px));
+    }
+  }
+
+  /* 当屏幕宽度在 1024px 到 1200px 之间时，目录紧贴左侧 */
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    .table-of-contents {
+      left: 1rem;
+      /* 确保目录右边界不超过视口中心，避免覆盖内容 */
+      right: auto;
+    }
+  }
+
+  .toc-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .toc-link {
+    display: block;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .toc-link:hover {
+    color: var(--color-text-primary);
+    background: var(--color-border);
+  }
+
+  .toc-item.active .toc-link {
+    color: var(--color-text-primary);
+    background: var(--color-border);
+    font-weight: 500;
+  }
+
+  /* 不同级别的缩进 */
+  .toc-level-1 {
+    padding-left: 0;
+  }
+
+  .toc-level-2 {
+    padding-left: 0.75rem;
+  }
+
+  .toc-level-3 {
+    padding-left: 1.5rem;
+  }
+
+  .toc-level-4 {
+    padding-left: 2.25rem;
+  }
+
+  .toc-level-5 {
+    padding-left: 3rem;
+  }
+
+  .toc-level-6 {
+    padding-left: 3.75rem;
+  }
+
+  /* 滚动条样式 */
+  .table-of-contents::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .table-of-contents::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .table-of-contents::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+
+  .table-of-contents::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
   }
 </style>
 

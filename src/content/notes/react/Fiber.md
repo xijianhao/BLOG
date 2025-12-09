@@ -9,13 +9,35 @@ order: 3
 
 # 概念
 
-首先React15以及之前更新过程是递归遍历虚拟DOM树，整个过程同步执行，不可中断，如果组件树很大，就可能造成页面卡顿等异常。
+Fiber 是 React 为了实现并发渲染而重构的核心架构。它的本质是把组件树的更新过程从递归改为基于链表的迭代遍历，每个组件对应一个 Fiber 节点，节点中不仅保存组件信息，还记录工作状态、副作用、优先级等。
 
-React16重构了协调引擎，也就是Fiber，本质上是一个虚拟的调用栈帧，把原来的递归变成了可中断的链表遍历。使整个更新过程 `可中断`。
+Fiber 通过 双缓存机制（current / workInProgress） 实现安全的增量更新；利用 Scheduler 在浏览器空闲时执行工作，并支持高优先级更新打断低优先级任务。
 
-整体总结 Fiber的目标是为了让React 能够通过 `分片工作` + `中断` +  `恢复` + `优先级调度`的机制， 实现流畅的UI体验。
+整个 reconcile 过程分为 beginWork（向下构建子树）和 completeWork（向上收集副作用），每处理一个 Fiber 节点就检查是否需要让出主线程。这种设计使得 React 能够在保持 UI 流畅的同时，完成复杂的更新逻辑。
 
-每一个Fiber呢就是一个工作单元，每个React元素在内存中都会对应一个Fiber节点；
+可以说，Fiber 不是一种数据结构，而是一套可中断、可恢复、可调度的工作协调机制。
+
+
+# 起源
+
+在 React 15 及之前，React 使用 递归 + 同步 的方式构建和更新组件树（称为 Stack Reconciler）：
+
+浏览器主线程 = 渲染 + JS + 用户输入。长时间 JS 运行会阻塞用户交互！
+
+- 一旦开始更新，就必须一口气完成整个树的 diff 和 DOM 操作
+- 如果组件树很大（比如上千节点），这个过程会长时间占用主线程
+- 导致卡顿、掉帧、交互无响应
+
+
+
+**Fiber的目标**：把渲染/更新工作拆成小块，利用浏览器空闲时间执行，支持中断、恢复、优先级调度。
+
+这就是 增量渲染（Incremental Rendering）。
+
+**Fiber的核心思想**：用链表+工作单元 替换递归
+
+关键转变：递归调用+不可中断+无优先级概念 -> 迭代遍历+可中断可恢复+支持lane优先级调度
+
 
 ## Fiber节点数据结构
 
@@ -108,9 +130,21 @@ function performUnitOfWork(fiber) {
 
 # Fiber架构的双缓存机制
 
-react同时维护两棵树，实现无闪烁更新。
+“React 的双缓存机制通过每个 Fiber 节点的 alternate 字段实现。每次更新时，React 会基于当前的 current 树创建或复用一棵 workInProgress 树。这棵树在后台构建，完全不影响当前 UI。
 
+构建过程中，如果被高优先级更新打断，可以直接丢弃 workInProgress，因为 current 树始终完整。
+
+当更新完成后，在 Commit 阶段通过一句 root.current = finishedWork 完成切换，时间复杂度 O(1)。
+
+这种设计使得 React 能安全地实现可中断渲染，是并发模式的基石。”
+
+react同时维护两棵树，实现无闪烁更新。
 他会保存当前树，和正在构建的树，通过调度完成渲染后，react直接把切换指针即可。
+- current 树：当前显示在屏幕上的 Fiber 树
+- workInProgress 树：正在构建的新 Fiber 树
+
+构建完成后，两者互换（root.current = workInProgress） 切换指针即可，实现 O(1) 切换
+
 
 ``` javascript
 // 双缓存数据结构
@@ -203,6 +237,7 @@ function scheduleUpdate(fiber, lane) {
 ## 阶段三： cleanup
 - 清理副作用
 - 准备下一轮更新
+
 
 # 为什么Fiber能提高性能
 
