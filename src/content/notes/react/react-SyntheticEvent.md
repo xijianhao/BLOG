@@ -1,10 +1,10 @@
 ---
 title: React 事件机制
 notebook: react
-date: 2025-11-30
+date: 2025-01-02
 tags: ['react', '基础', '概念']
 excerpt: React核心设计之一 统一了不同浏览器的行为，提供了更好的性能和开发体验。
-order: 2
+order: 3
 ---
 
 # 什么是React事件机制？
