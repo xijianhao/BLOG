@@ -122,6 +122,8 @@ Cache-Control: private, max-age=600
 - **Network面板**：Size列显示 `(disk cache)` 或 `(memory cache)`
 - **请求头**：不会发送请求到服务器
 
+
+
 # 协商缓存（Conditional Cache）
 
 ## 核心机制
