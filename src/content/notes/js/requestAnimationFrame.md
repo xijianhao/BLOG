@@ -1,5 +1,5 @@
 ---
-title: RequestAnimationFrame
+title: RAF（RequestAnimationFrame）
 notebook: js
 date: 2024-08-22
 tags: ['基础']
