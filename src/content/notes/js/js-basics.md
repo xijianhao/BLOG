@@ -1,11 +1,25 @@
 ---
-title: 作用域、闭包
+title: 基础
 notebook: js
 date: 2024-05-10
 tags: ['基础']
-excerpt: 理解 作用域、作用域链、闭包。
+excerpt: 理解JS数据类型、作用域、闭包。
 order: 0
 ---
+
+# 数据类型
+### 原始类型（7种）：
+ undefined, null, boolean, number, string, symbol, bigint
+### 引用类型（1种）：
+ object（含 Array、Function、Date 等）
+
+### 判断类型
+``` javascript
+function getType(value) {
+  if (value == null) return value + ''; // 'null' or 'undefined'
+  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
+}
+```
 
 # 作用域
 

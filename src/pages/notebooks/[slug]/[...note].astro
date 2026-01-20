@@ -2,7 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { getNotebookBySlug } from '../../../utils/notebooks';
-import { TableOfContents } from '../../../components/TableOfContents';
+import { TableOfContents } from '../../../components/TableOfContents'; // 遮挡视线 暂时不用
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes');
@@ -43,7 +43,7 @@ const { title, date, tags } = note.data;
       <div class="note-content">
         <Content />
       </div>
-      <TableOfContents client:load />
+      <!-- <TableOfContents client:load /> --> 
     </div>
   </article>
 </Layout>
