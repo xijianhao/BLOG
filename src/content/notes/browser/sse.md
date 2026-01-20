@@ -1,10 +1,10 @@
 ---
-title: sse - Server-SendEvent
+title: SSE - Server-SendEvent
 notebook: browser
 date: 2025-09-04
 tags: ['网络']
 excerpt: SSE是HTML5标准的一部分，允许服务器向客户端推送单向事件流。
-order: 2
+order: 5
 ---
 
 

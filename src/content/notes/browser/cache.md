@@ -4,7 +4,7 @@ notebook: browser
 date: 2024-12-20
 tags: ['浏览器', '性能优化', 'HTTP']
 excerpt: 深入解析浏览器缓存机制，涵盖强缓存、协商缓存、Cache-Control、ETag等核心概念及面试考察要点
-order: 3
+order: 2
 ---
 
 # 缓存概述

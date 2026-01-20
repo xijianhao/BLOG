@@ -2,6 +2,7 @@
 title: 基础
 notebook: js
 date: 2024-05-10
+updateDate: 2026-01-20
 tags: ['基础']
 excerpt: 理解JS数据类型、作用域、闭包。
 order: 0
