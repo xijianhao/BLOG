@@ -1,0 +1,421 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  notebook: CollectionEntry<'notebooks'>;
+  notebookSlug: string;
+  notes: CollectionEntry<'notes'>[];
+  noteSlug: string | null;
+  noteEntry: CollectionEntry<'notes'> | null;
+}
+
+const { notebook, notebookSlug, notes, noteSlug, noteEntry } = Astro.props;
+const { title: nbTitle } = notebook.data;
+
+const renderResult = noteEntry ? await noteEntry.render() : null;
+const Content = renderResult?.Content;
+const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
+---
+
+<div class="notebook-layout">
+  <aside class="sidebar" transition:persist={`notebook-sidebar-${notebookSlug}`}>
+    <div class="sidebar-header">
+      <a href="/" class="back-link" aria-label="返回首页">←</a>
+      <h1 class="notebook-title">{nbTitle}</h1>
+    </div>
+    <nav class="notes-nav">
+      {notes.length > 0 ? (
+        <ul class="notes-list">
+          {notes.map((note) => {
+            const isActive = noteSlug === note.slug;
+            const href = `/notebooks/${notebookSlug}/${note.slug}`;
+            return (
+              <li>
+                <a href={href} class:list={['note-link', { active: isActive }]} data-note-link>
+                  <span class="note-link-title">{note.data.title}</span>
+                  {note.data.excerpt && (
+                    <span class="note-link-excerpt">{note.data.excerpt}</span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p class="sidebar-empty">暂无笔记</p>
+      )}
+    </nav>
+  </aside>
+
+  <main class="note-main" transition:name="note-main">
+    {noteEntry && Content ? (
+      <article class="note-article">
+        <header class="note-header">
+          <h1 class="note-title">{noteTitle}</h1>
+          <div class="note-meta">
+            {tags && tags.length > 0 && (
+              <div class="note-tags">
+                {tags.map((tag: string) => (
+                  <span class="note-tag">{tag}</span>
+                ))}
+              </div>
+            )}
+            {date && (
+              <time datetime={date.toISOString()}>
+                {date.toLocaleDateString('zh-CN', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+            )}
+          </div>
+        </header>
+        <div class="note-content">
+          <Content />
+        </div>
+      </article>
+    ) : (
+      <div class="placeholder">
+        {notes.length > 0 ? (
+          <p>选择左侧笔记开始阅读</p>
+        ) : (
+          <p>暂无笔记，快去添加一些吧！</p>
+        )}
+      </div>
+    )}
+  </main>
+</div>
+
+<style>
+  .notebook-layout {
+    display: flex;
+    gap: 1rem;
+    min-height: 60vh;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .sidebar {
+    flex-shrink: 0;
+    width: 280px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(89, 56, 44, 0.1);
+    padding: 1rem;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: 8px;
+    background: var(--color-border);
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .back-link:hover {
+    background: var(--color-text-secondary);
+    color: var(--color-bg);
+  }
+
+  .notebook-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .notes-list li {
+    margin-bottom: 0.25rem;
+  }
+
+  .note-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text-primary);
+    transition: background 0.2s;
+  }
+
+  .note-link:hover {
+    background: var(--color-border);
+  }
+
+  .note-link.active {
+    background: var(--color-border);
+    font-weight: 600;
+  }
+
+  .note-link-title {
+    display: block;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .note-link-excerpt {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-empty {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+  }
+
+  .note-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .note-article {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(89, 56, 44, 0.1);
+    padding: 1rem;
+  }
+
+  .note-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .note-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .note-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .note-tags {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+  }
+
+  .note-tag {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    background: var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: 6px;
+  }
+
+  .note-content {
+    line-height: 1.8;
+    color: var(--color-text-primary);
+  }
+
+  .placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+  }
+
+  .note-content :global(h1),
+  .note-content :global(h2),
+  .note-content :global(h3),
+  .note-content :global(h4),
+  .note-content :global(h5),
+  .note-content :global(h6) {
+    scroll-margin-top: 100px;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+  }
+
+  .note-content :global(h1) {
+    font-size: 1.75rem;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 0.5rem;
+  }
+
+  .note-content :global(h2) {
+    font-size: 1.375rem;
+  }
+
+  .note-content :global(h3) {
+    font-size: 1.125rem;
+  }
+
+  .note-content :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .note-content :global(ul),
+  .note-content :global(ol) {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+  }
+
+  .note-content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .note-content :global(code) {
+    background: var(--color-border);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    color: var(--color-text-primary);
+  }
+
+  .note-content :global(pre) {
+    background: var(--color-text-primary);
+    color: var(--color-bg);
+    padding: 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+    border: 1px solid var(--color-text-secondary);
+  }
+
+  .note-content :global(pre code) {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: 0.875rem;
+  }
+
+  .note-content :global(blockquote) {
+    border-left: 4px solid var(--color-text-secondary);
+    padding: 1rem 1rem 1rem 1.25rem;
+    margin: 1rem 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .note-content :global(a) {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .note-content :global(a:hover) {
+    border-bottom-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .note-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+
+  .note-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.25rem;
+  }
+
+  .note-content :global(th),
+  .note-content :global(td) {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .note-content :global(th) {
+    font-weight: 600;
+    background: var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .notebook-layout {
+      flex-direction: column;
+    }
+
+    .sidebar {
+      width: 100%;
+      max-height: none;
+    }
+
+    .notes-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .note-link-excerpt {
+      display: none;
+    }
+
+    .note-title {
+      font-size: 1.35rem;
+    }
+
+    .note-content {
+      padding: 1rem;
+    }
+  }
+</style>
