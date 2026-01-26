@@ -15,6 +15,14 @@ const { title: nbTitle } = notebook.data;
 const renderResult = noteEntry ? await noteEntry.render() : null;
 const Content = renderResult?.Content;
 const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
+
+// 规范化路径：移除尾随斜杠
+function normalizePath(path: string): string {
+  return path.replace(/\/$/, '') || '/';
+}
+
+// 获取当前 URL 路径，用于高亮判断
+const currentPath = normalizePath(Astro.url.pathname);
 ---
 
 <div class="notebook-layout">
@@ -27,8 +35,10 @@ const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
       {notes.length > 0 ? (
         <ul class="notes-list">
           {notes.map((note) => {
-            const isActive = noteSlug === note.slug;
             const href = `/notebooks/${notebookSlug}/${note.slug}`;
+            const normalizedHref = normalizePath(href);
+            // 使用规范化后的路径进行比较，确保高亮正确
+            const isActive = currentPath === normalizedHref;
             return (
               <li>
                 <a href={href} class:list={['note-link', { active: isActive }]} data-note-link>
@@ -216,7 +226,7 @@ const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
     border: 1px solid var(--color-border);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(89, 56, 44, 0.1);
-    padding: 1rem;
+    padding: 1rem; 
   }
 
   .note-header {
@@ -419,3 +429,44 @@ const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
     }
   }
 </style>
+
+<script is:inline>
+  // 规范化路径：移除尾随斜杠，统一格式
+  function normalizePath(path) {
+    return path.replace(/\/$/, '') || '/';
+  }
+
+  // 更新高亮状态的函数
+  function updateActiveLink() {
+    const currentPath = normalizePath(window.location.pathname);
+    const links = document.querySelectorAll('[data-note-link]');
+    
+    links.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href) {
+        const normalizedHref = normalizePath(href);
+        // 使用规范化后的路径进行比较
+        if (currentPath === normalizedHref) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  // 页面加载时更新
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateActiveLink);
+  } else {
+    updateActiveLink();
+  }
+
+  // 监听 View Transitions 完成事件
+  document.addEventListener('astro:page-load', updateActiveLink);
+  
+  // 兼容性：如果没有 View Transitions，监听 popstate 事件
+  window.addEventListener('popstate', updateActiveLink);
+</script>
