@@ -9,7 +9,7 @@ icon: |
     <ellipse cx="12" cy="12" rx="10" ry="3.5" stroke="#61dafb" stroke-width="1.2" fill="none" opacity="0.7" transform="rotate(120 12 12)"/>
   </svg>
 color: #61dafb
-order: 1
+order: 2
 ---
 
 # React 笔记本
