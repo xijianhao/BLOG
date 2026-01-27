@@ -32,36 +32,45 @@ const { title = 'KeGoLog', description = 'KEGO NOTES - Record learning and life'
             textPrimary: '#59382C',
             textSecondary: '#8C5B49',
           },
-          'ocean': {
-            bg: '#E8F4F8',
-            border: '#B8D4E3',
-            textPrimary: '#1A4D5C',
-            textSecondary: '#2D6A7F',
+          'midnight': {
+            bg: '#1A1B26',
+            border: '#2D3142',
+            textPrimary: '#C0CAF5',
+            textSecondary: '#7AA2F7',
           },
           'forest': {
-            bg: '#F0F5E8',
-            border: '#C8D9B0',
-            textPrimary: '#2D4A1F',
-            textSecondary: '#4A6B3A',
+            bg: '#F0F4ED',
+            border: '#C9D6C4',
+            textPrimary: '#2F5233',
+            textSecondary: '#4A7C4E',
           },
-          'sunset': {
-            bg: '#FFF5E6',
-            border: '#FFD4A3',
-            textPrimary: '#8B4513',
-            textSecondary: '#CD853F',
+          'ocean': {
+            bg: '#E8F2F7',
+            border: '#B8D8E8',
+            textPrimary: '#0D4F6F',
+            textSecondary: '#2B7A9E',
           },
         };
 
-        const savedThemeId = localStorage.getItem('theme-id') || 'ponkotsu-house';
-        const theme = themes[savedThemeId] || themes['ponkotsu-house'];
-        
-        if (theme) {
-          const root = document.documentElement;
-          root.style.setProperty('--color-bg', theme.bg);
-          root.style.setProperty('--color-border', theme.border);
-          root.style.setProperty('--color-text-primary', theme.textPrimary);
-          root.style.setProperty('--color-text-secondary', theme.textSecondary);
+        function applyTheme() {
+          const savedThemeId = localStorage.getItem('theme-id') || 'ponkotsu-house';
+          const theme = themes[savedThemeId] || themes['ponkotsu-house'];
+
+          if (theme) {
+            const root = document.documentElement;
+            root.style.setProperty('--color-bg', theme.bg);
+            root.style.setProperty('--color-border', theme.border);
+            root.style.setProperty('--color-text-primary', theme.textPrimary);
+            root.style.setProperty('--color-text-secondary', theme.textSecondary);
+          }
         }
+
+        // 初次加载时应用主题
+        applyTheme();
+
+        // 监听 Astro 路由切换事件，在页面交换前应用主题
+        document.addEventListener('astro:before-swap', applyTheme);
+        document.addEventListener('astro:after-swap', applyTheme);
       })();
     </script>
   </head>
@@ -235,13 +244,12 @@ const { title = 'KeGoLog', description = 'KEGO NOTES - Record learning and life'
     width: 100%;
     box-sizing: border-box;
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow:hidden;
   }
 
   .footer {
     text-align: center;
-    padding: 2rem;
+    padding: 1rem;
     color: var(--color-text-secondary);
     font-size: 0.875rem;
     width: 100%;

@@ -12,33 +12,33 @@ const themes = [
     },
   },
   {
-    id: 'ocean',
-    name: 'Ocean',
+    id: 'midnight',
+    name: 'Midnight',
     colors: {
-      bg: '#E8F4F8',
-      border: '#B8D4E3',
-      textPrimary: '#1A4D5C',
-      textSecondary: '#2D6A7F',
+      bg: '#1A1B26',
+      border: '#2D3142',
+      textPrimary: '#C0CAF5',
+      textSecondary: '#7AA2F7',
     },
   },
   {
     id: 'forest',
     name: 'Forest',
     colors: {
-      bg: '#F0F5E8',
-      border: '#C8D9B0',
-      textPrimary: '#2D4A1F',
-      textSecondary: '#4A6B3A',
+      bg: '#F0F4ED',
+      border: '#C9D6C4',
+      textPrimary: '#2F5233',
+      textSecondary: '#4A7C4E',
     },
   },
   {
-    id: 'sunset',
-    name: 'Sunset',
+    id: 'ocean',
+    name: 'Ocean',
     colors: {
-      bg: '#FFF5E6',
-      border: '#FFD4A3',
-      textPrimary: '#8B4513',
-      textSecondary: '#CD853F',
+      bg: '#E8F2F7',
+      border: '#B8D8E8',
+      textPrimary: '#0D4F6F',
+      textSecondary: '#2B7A9E',
     },
   },
 ];
@@ -85,41 +85,36 @@ const themes = [
       },
     },
     {
-      id: 'ocean',
-      name: 'Ocean',
+      id: 'midnight',
+      name: 'Midnight',
       colors: {
-        bg: '#E8F4F8',
-        border: '#B8D4E3',
-        textPrimary: '#1A4D5C',
-        textSecondary: '#2D6A7F',
+        bg: '#1A1B26',
+        border: '#2D3142',
+        textPrimary: '#C0CAF5',
+        textSecondary: '#7AA2F7',
       },
     },
     {
       id: 'forest',
       name: 'Forest',
       colors: {
-        bg: '#F0F5E8',
-        border: '#C8D9B0',
-        textPrimary: '#2D4A1F',
-        textSecondary: '#4A6B3A',
+        bg: '#F0F4ED',
+        border: '#C9D6C4',
+        textPrimary: '#2F5233',
+        textSecondary: '#4A7C4E',
       },
     },
     {
-      id: 'sunset',
-      name: 'Sunset',
+      id: 'ocean',
+      name: 'Ocean',
       colors: {
-        bg: '#FFF5E6',
-        border: '#FFD4A3',
-        textPrimary: '#8B4513',
-        textSecondary: '#CD853F',
+        bg: '#E8F2F7',
+        border: '#B8D8E8',
+        textPrimary: '#0D4F6F',
+        textSecondary: '#2B7A9E',
       },
     },
   ];
-
-  const themeButton = document.getElementById('theme-button');
-  const themeDropdown = document.getElementById('theme-dropdown');
-  const themeOptions = document.querySelectorAll('.theme-option');
-  const themeContainer = document.querySelector('.theme-container');
 
   // 从 localStorage 加载保存的主题
   function loadTheme() {
@@ -135,7 +130,10 @@ const themes = [
     root.style.setProperty('--color-border', theme.colors.border);
     root.style.setProperty('--color-text-primary', theme.colors.textPrimary);
     root.style.setProperty('--color-text-secondary', theme.colors.textSecondary);
-    
+
+    const themeButton = document.getElementById('theme-button');
+    const themeOptions = document.querySelectorAll('.theme-option');
+
     // 更新按钮预览
     const preview = themeButton?.querySelector('.theme-preview');
     if (preview) {
@@ -152,10 +150,10 @@ const themes = [
         }
       });
     }
-    
+
     // 保存到 localStorage
     localStorage.setItem('theme-id', theme.id);
-    
+
     // 更新选中状态
     themeOptions.forEach((option) => {
       const themeId = option.getAttribute('data-theme-id');
@@ -165,8 +163,10 @@ const themes = [
 
   // 切换下拉菜单显示
   function toggleDropdown() {
+    const themeButton = document.getElementById('theme-button');
+    const themeDropdown = document.getElementById('theme-dropdown');
     const isActive = themeDropdown?.classList.toggle('active');
-    
+
     // 在移动端使用 fixed 定位
     if (isActive && window.innerWidth <= 768 && themeButton && themeDropdown) {
       const buttonRect = themeButton.getBoundingClientRect();
@@ -181,46 +181,68 @@ const themes = [
     }
   }
 
-  // 点击按钮切换下拉菜单
-  themeButton?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleDropdown();
-  });
+  // 初始化事件监听器
+  function initThemeListeners() {
+    const themeButton = document.getElementById('theme-button');
+    const themeDropdown = document.getElementById('theme-dropdown');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const themeContainer = document.querySelector('.theme-container');
 
-  // 点击主题选项
-  themeOptions.forEach((option) => {
-    option.addEventListener('click', () => {
-      const themeId = option.getAttribute('data-theme-id');
-      const theme = themes.find((t) => t.id === themeId);
-      if (theme) {
-        applyTheme(theme);
+    // 移除旧的事件监听器（通过克隆替换）
+    if (themeButton) {
+      const newButton = themeButton.cloneNode(true);
+      themeButton.parentNode?.replaceChild(newButton, themeButton);
+
+      // 点击按钮切换下拉菜单
+      newButton.addEventListener('click', (e) => {
+        e.stopPropagation();
         toggleDropdown();
-        // 关闭后重置定位样式
-        if (themeDropdown && !themeDropdown.classList.contains('active')) {
-          themeDropdown.style.position = '';
-          themeDropdown.style.top = '';
-          themeDropdown.style.right = '';
+      });
+    }
+
+    // 点击主题选项
+    themeOptions.forEach((option) => {
+      const newOption = option.cloneNode(true) as Element;
+      option.parentNode?.replaceChild(newOption, option);
+
+      newOption.addEventListener('click', () => {
+        const themeId = newOption.getAttribute('data-theme-id');
+        const theme = themes.find((t) => t.id === themeId);
+        if (theme) {
+          applyTheme(theme);
+          toggleDropdown();
+          const dropdown = document.getElementById('theme-dropdown');
+          // 关闭后重置定位样式
+          if (dropdown && !dropdown.classList.contains('active')) {
+            dropdown.style.position = '';
+            dropdown.style.top = '';
+            dropdown.style.right = '';
+          }
+        }
+      });
+    });
+
+    // 点击外部关闭下拉菜单（使用事件委托，避免重复绑定）
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      const container = document.querySelector('.theme-container');
+      const dropdown = document.getElementById('theme-dropdown');
+      if (container && !container.contains(target)) {
+        dropdown?.classList.remove('active');
+        // 重置定位样式
+        if (dropdown) {
+          dropdown.style.position = '';
+          dropdown.style.top = '';
+          dropdown.style.right = '';
         }
       }
     });
-  });
-
-  // 点击外部关闭下拉菜单
-  document.addEventListener('click', (e) => {
-    const target = e.target as Node;
-    if (themeContainer && !themeContainer.contains(target)) {
-      themeDropdown?.classList.remove('active');
-      // 重置定位样式
-      if (themeDropdown) {
-        themeDropdown.style.position = '';
-        themeDropdown.style.top = '';
-        themeDropdown.style.right = '';
-      }
-    }
-  });
+  }
 
   // 窗口大小变化时重新计算位置
   window.addEventListener('resize', () => {
+    const themeButton = document.getElementById('theme-button');
+    const themeDropdown = document.getElementById('theme-dropdown');
     if (themeDropdown?.classList.contains('active') && window.innerWidth <= 768 && themeButton) {
       const buttonRect = themeButton.getBoundingClientRect();
       themeDropdown.style.position = 'fixed';
@@ -229,8 +251,19 @@ const themes = [
     }
   });
 
-  // 页面加载时应用保存的主题
-  loadTheme();
+  // 页面加载时初始化
+  function init() {
+    loadTheme();
+    initThemeListeners();
+  }
+
+  // 初次加载
+  init();
+
+  // 监听 Astro 页面导航事件，在路由切换后重新初始化
+  document.addEventListener('astro:page-load', () => {
+    init();
+  });
 </script>
 
 <style>
