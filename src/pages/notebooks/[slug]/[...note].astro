@@ -9,8 +9,11 @@ export async function getStaticPaths() {
   const notes = await getCollection('notes');
   return notes.map((note) => {
     const notebookSlug = note.data.notebook;
+    // 移除 slug 中的笔记本文件夹前缀，因为它已经在路由的 [slug] 部分
+    // 例如：note.slug 是 "browser/rander"，只需要 "rander" 部分
+    const noteSlugWithoutFolder = note.slug.replace(`${notebookSlug}/`, '');
     return {
-      params: { slug: notebookSlug, note: note.slug },
+      params: { slug: notebookSlug, note: noteSlugWithoutFolder },
       props: { note, notebookSlug },
     };
   });

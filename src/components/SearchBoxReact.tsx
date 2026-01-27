@@ -9,6 +9,7 @@ interface NoteSearchData {
   excerpt: string;
   tags: string[];
   date: string;
+  isAI?: boolean;
 }
 
 interface SearchBoxReactProps {
@@ -84,7 +85,9 @@ export default function SearchBoxReact({ notesData }: SearchBoxReactProps) {
         setSelectedIndex((prev: number) => Math.max(prev - 1, -1));
       } else if (e.key === 'Enter' && selectedIndex >= 0 && results[selectedIndex]) {
         e.preventDefault();
-        window.location.href = `/notebooks/${results[selectedIndex].notebook}/${results[selectedIndex].slug}`;
+        const result = results[selectedIndex];
+        const baseUrl = result.isAI ? '/ai-notebooks' : '/notebooks';
+        window.location.href = `${baseUrl}/${result.notebook}/${result.slug}`;
       } else if (e.key === 'Escape') {
         setIsActive(false);
         searchInput.blur();
@@ -111,7 +114,9 @@ export default function SearchBoxReact({ notesData }: SearchBoxReactProps) {
 
   const handleResultClick = (index: number) => {
     if (results[index]) {
-      window.location.href = `/notebooks/${results[index].notebook}/${results[index].slug}`;
+      const result = results[index];
+      const baseUrl = result.isAI ? '/ai-notebooks' : '/notebooks';
+      window.location.href = `${baseUrl}/${result.notebook}/${result.slug}`;
     }
   };
 

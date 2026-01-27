@@ -28,3 +28,32 @@ export async function getAllNotes() {
   return notes.sort((a: CollectionEntry<'notes'>, b: CollectionEntry<'notes'>) => b.data.date.getTime() - a.data.date.getTime());
 }
 
+// AI 笔记本相关函数
+export async function getAllAINotebooks() {
+  const aiNotebooks = await getCollection('aiNotebooks');
+  return aiNotebooks.sort((a: CollectionEntry<'aiNotebooks'>, b: CollectionEntry<'aiNotebooks'>) => a.data.order - b.data.order);
+}
+
+export async function getAINotebookBySlug(slug: string) {
+  const aiNotebooks = await getCollection('aiNotebooks');
+  return aiNotebooks.find((nb: CollectionEntry<'aiNotebooks'>) => nb.slug === slug);
+}
+
+export async function getAINotesByNotebook(aiNotebookSlug: string) {
+  const aiNotes = await getCollection('aiNotes');
+  return aiNotes
+    .filter((note: CollectionEntry<'aiNotes'>) => note.data.aiNotebook === aiNotebookSlug)
+    .sort((a: CollectionEntry<'aiNotes'>, b: CollectionEntry<'aiNotes'>) => {
+      // 先按 order 排序，再按日期排序
+      if (a.data.order !== b.data.order) {
+        return a.data.order - b.data.order;
+      }
+      return b.data.date.getTime() - a.data.date.getTime();
+    });
+}
+
+export async function getAllAINotes() {
+  const aiNotes = await getCollection('aiNotes');
+  return aiNotes.sort((a: CollectionEntry<'aiNotes'>, b: CollectionEntry<'aiNotes'>) => b.data.date.getTime() - a.data.date.getTime());
+}
+

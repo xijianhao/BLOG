@@ -2,19 +2,22 @@
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  notebook: CollectionEntry<'notebooks'>;
+  notebook: CollectionEntry<'notebooks'> | CollectionEntry<'aiNotebooks'>;
   notebookSlug: string;
-  notes: CollectionEntry<'notes'>[];
+  notes: CollectionEntry<'notes'>[] | CollectionEntry<'aiNotes'>[];
   noteSlug: string | null;
-  noteEntry: CollectionEntry<'notes'> | null;
+  noteEntry: CollectionEntry<'notes'> | CollectionEntry<'aiNotes'> | null;
+  isAINotebook?: boolean;
 }
 
-const { notebook, notebookSlug, notes, noteSlug, noteEntry } = Astro.props;
+const { notebook, notebookSlug, notes, noteSlug, noteEntry, isAINotebook = false } = Astro.props;
 const { title: nbTitle } = notebook.data;
 
 const renderResult = noteEntry ? await noteEntry.render() : null;
 const Content = renderResult?.Content;
 const { title: noteTitle, date, tags } = noteEntry?.data ?? {};
+
+const baseUrl = isAINotebook ? '/ai-notebooks' : '/notebooks';
 
 // 规范化路径：移除尾随斜杠
 function normalizePath(path: string): string {
@@ -35,7 +38,10 @@ const currentPath = normalizePath(Astro.url.pathname);
       {notes.length > 0 ? (
         <ul class="notes-list">
           {notes.map((note) => {
-            const href = `/notebooks/${notebookSlug}/${note.slug}`;
+            // 对于所有笔记本，都需要移除文件夹前缀，只使用文件名
+            // 因为文件夹名已经包含在 notebookSlug 中
+            const noteSlug = note.slug.split('/').pop() || note.slug;
+            const href = `${baseUrl}/${notebookSlug}/${noteSlug}`;
             const normalizedHref = normalizePath(href);
             // 使用规范化后的路径进行比较，确保高亮正确
             const isActive = currentPath === normalizedHref;

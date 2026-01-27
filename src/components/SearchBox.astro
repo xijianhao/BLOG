@@ -1,6 +1,5 @@
 ---
-import { getAllNotes } from '../utils/notebooks';
-import { getNotebookBySlug } from '../utils/notebooks';
+import { getAllNotes, getAllAINotes, getNotebookBySlug, getAINotebookBySlug } from '../utils/notebooks';
 import SearchBoxReact from './SearchBoxReact';
 
 // 获取所有笔记数据用于搜索
@@ -12,12 +11,14 @@ interface NoteSearchData {
   excerpt: string;
   tags: string[];
   date: string;
+  isAI?: boolean; // 标识是否为 AI 笔记
 }
 
 let notesData: NoteSearchData[] = [];
 try {
+  // 获取普通笔记
   const allNotes = await getAllNotes();
-  notesData = await Promise.all(
+  const normalNotesData = await Promise.all(
     allNotes.map(async (note) => {
       const notebook = await getNotebookBySlug(note.data.notebook);
       return {
@@ -28,9 +29,33 @@ try {
         excerpt: note.data.excerpt || '',
         tags: note.data.tags || [],
         date: note.data.date.toISOString(),
+        isAI: false,
       };
     })
   );
+
+  // 获取 AI 笔记
+  const allAINotes = await getAllAINotes();
+  const aiNotesData = await Promise.all(
+    allAINotes.map(async (note) => {
+      const notebook = await getAINotebookBySlug(note.data.aiNotebook);
+      // 只使用文件名作为 slug，移除文件夹路径
+      const noteSlug = note.slug.split('/').pop() || note.slug;
+      return {
+        slug: noteSlug,
+        title: note.data.title,
+        notebook: note.data.aiNotebook,
+        notebookTitle: notebook?.data.title || note.data.aiNotebook,
+        excerpt: note.data.excerpt || '',
+        tags: note.data.tags || [],
+        date: note.data.date.toISOString(),
+        isAI: true,
+      };
+    })
+  );
+
+  // 合并两种笔记
+  notesData = [...normalNotesData, ...aiNotesData];
 } catch (error) {
   console.error('Error loading notes for search:', error);
   notesData = [];

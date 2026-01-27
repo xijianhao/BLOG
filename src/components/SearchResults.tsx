@@ -8,6 +8,7 @@ interface NoteSearchData {
   excerpt: string;
   tags: string[];
   date: string;
+  isAI?: boolean;
 }
 
 interface SearchResultsProps {
@@ -54,10 +55,12 @@ export function SearchResults({ results, query, selectedIndex, onResultClick, on
 
   return (
     <>
-      {results.map((note, index) => (
+      {results.map((note, index) => {
+        const baseUrl = note.isAI ? '/ai-notebooks' : '/notebooks';
+        return (
         <a
           key={`${note.notebook}-${note.slug}`}
-          href={`/notebooks/${note.notebook}/${note.slug}`}
+          href={`${baseUrl}/${note.notebook}/${note.slug}`}
           className={`search-result-item ${selectedIndex === index ? 'selected' : ''}`}
           data-index={index}
           onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -89,7 +92,8 @@ export function SearchResults({ results, query, selectedIndex, onResultClick, on
             </div>
           )}
         </a>
-      ))}
+        );
+      })}
     </>
   );
 }

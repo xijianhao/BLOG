@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import NotebookLayout from '../../components/NotebookLayout.astro';
+import { getCollection } from 'astro:content';
+import { getAINotesByNotebook } from '../../utils/notebooks';
+
+export async function getStaticPaths() {
+  const aiNotebooks = await getCollection('aiNotebooks');
+  return aiNotebooks.map((notebook) => ({
+    params: { slug: notebook.slug },
+    props: { notebook },
+  }));
+}
+
+const { notebook } = Astro.props as { notebook: CollectionEntry<'aiNotebooks'> };
+const notes = await getAINotesByNotebook(notebook.slug);
+const firstNote = notes[0] ?? null;
+const { title, description } = notebook.data;
+const pageTitle = firstNote
+  ? `${firstNote.data.title} - ${title}`
+  : `${title} - KeGoLog`;
+
+// 只使用文件名作为 noteSlug
+const firstNoteSlug = firstNote ? (firstNote.slug.split('/').pop() || firstNote.slug) : null;
+---
+
+<Layout title={pageTitle} description={description || undefined}>
+  <NotebookLayout
+    notebook={notebook}
+    notebookSlug={notebook.slug}
+    notes={notes}
+    noteSlug={firstNoteSlug}
+    noteEntry={firstNote}
+    isAINotebook={true}
+  />
+</Layout>

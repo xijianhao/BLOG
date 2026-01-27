@@ -1,13 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import NotebookCard from '../components/NotebookCard.astro';
+import AINotebookCard from '../components/AINotebookCard.astro';
 import NoteCard from '../components/NoteCard.astro';
-import { getAllNotebooks, getAllNotes } from '../utils/notebooks';
+import { getAllNotebooks, getAllNotes, getAllAINotebooks, getAllAINotes } from '../utils/notebooks';
 import type { CollectionEntry } from 'astro:content';
 
 const notebooks = await getAllNotebooks();
 const allNotes = await getAllNotes();
 const latestNotes = allNotes.slice(0, 10);
+
+// AI 笔记本数据
+const aiNotebooks = await getAllAINotebooks();
+const allAINotes = await getAllAINotes();
+// 首页展示所有 AI 笔记本，通过 CSS 限制最多显示两行
+const displayAINotebooks = aiNotebooks;
 
 // 创建笔记本映射，用于快速查找笔记本信息
 const notebookMap = new Map<string, CollectionEntry<'notebooks'>>();
@@ -20,6 +27,13 @@ const notebookNoteCounts = new Map<string, number>();
 allNotes.forEach((note) => {
   const notebookSlug = note.data.notebook;
   notebookNoteCounts.set(notebookSlug, (notebookNoteCounts.get(notebookSlug) || 0) + 1);
+});
+
+// 计算每个 AI 笔记本的笔记数量
+const aiNotebookNoteCounts = new Map<string, number>();
+allAINotes.forEach((note) => {
+  const notebookSlug = note.data.aiNotebook;
+  aiNotebookNoteCounts.set(notebookSlug, (aiNotebookNoteCounts.get(notebookSlug) || 0) + 1);
 });
 
 // 为每个笔记准备笔记本信息
@@ -36,14 +50,33 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
 
 <Layout title="KeGoLog - Home">
   <div class="home-container">
+    {displayAINotebooks.length > 0 && (
+      <section class="ai-notebooks-section">
+        <div class="section-header">
+          <h2 class="section-title">AI 笔记本</h2>
+          <a href="/ai-notebooks" class="more-link">
+            更多 →
+          </a>
+        </div>
+        <div class="ai-notebooks-grid">
+          {displayAINotebooks.map((notebook: CollectionEntry<'aiNotebooks'>) => (
+            <AINotebookCard
+              notebook={notebook}
+              noteCount={aiNotebookNoteCounts.get(notebook.slug) || 0}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
     <div class="main-layout">
       {latestNotes.length > 0 && (
         <section class="latest-notes-section">
           <h2 class="section-title">最新笔记</h2>
           <div class="latest-notes-list">
             {latestNotesWithNotebook.map(({ note, notebookSlug, notebookIcon, notebookColor }) => (
-              <NoteCard 
-                note={note} 
+              <NoteCard
+                note={note}
                 notebookSlug={notebookSlug}
                 notebookIcon={notebookIcon}
                 notebookColor={notebookColor}
@@ -52,13 +85,13 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
           </div>
         </section>
       )}
-      
+
       <section class="notebooks-section">
         <h2 class="section-title">笔记本</h2>
         <div class="notebooks-grid">
           {notebooks.map((notebook: CollectionEntry<'notebooks'>) => (
-            <NotebookCard 
-              notebook={notebook} 
+            <NotebookCard
+              notebook={notebook}
               noteCount={notebookNoteCounts.get(notebook.slug) || 0}
             />
           ))}
@@ -71,6 +104,9 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
 <style>
   .home-container {
     animation: fadeIn 0.5s ease-in;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 
   @keyframes fadeIn {
@@ -82,6 +118,10 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .ai-notebooks-section {
+    width: 100%;
   }
 
   .main-layout {
@@ -100,6 +140,13 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
     min-width: 0;
   }
 
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
   .section-title {
     font-size: 1.5rem;
     font-weight: 600;
@@ -107,6 +154,48 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
     margin: 0 0 1.5rem 0;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--color-border);
+  }
+
+  .section-header .section-title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    flex: 1;
+  }
+
+  .more-link {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+    margin-left: 1rem;
+  }
+
+  .more-link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .ai-notebooks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    max-height: calc(80px * 2 + 1rem); /* 两行的高度：卡片高度 * 2 + 间距 */
+    /* overflow: hidden; */
+    position: relative;
+  }
+
+  /* 如果内容超出两行，添加渐变遮罩效果（可选） */
+  .ai-notebooks-grid::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, var(--color-bg));
+    pointer-events: none;
+    opacity: 0;
   }
 
   .latest-notes-list {
@@ -190,6 +279,10 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
   }
 
   @media (max-width: 768px) {
+    .home-container {
+      gap: 1.5rem;
+    }
+
     .main-layout {
       flex-direction: column;
       gap: 2rem;
@@ -203,6 +296,12 @@ const latestNotesWithNotebook = latestNotes.map((note) => {
     .notebooks-section {
       flex: 1;
       width: 100%;
+    }
+
+    .ai-notebooks-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      max-height: calc(75px * 2 + 0.75rem); /* 移动端：卡片高度 * 2 + 间距 */
     }
 
     .home-title {

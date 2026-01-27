@@ -2,11 +2,12 @@
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  notebook: CollectionEntry<'notebooks'>;
+  notebook: CollectionEntry<'notebooks'> | CollectionEntry<'aiNotebooks'>;
   noteCount?: number;
+  baseUrl?: string;
 }
 
-const { notebook, noteCount = 0 } = Astro.props;
+const { notebook, noteCount = 0, baseUrl = '/notebooks' } = Astro.props;
 const { title, description, icon, color } = notebook.data;
 
 // 处理图标：解析 SVG 或返回 emoji
@@ -55,7 +56,7 @@ const isSvg = iconContent.includes('<svg');
 
 ---
 
-<a href={`/notebooks/${notebook.slug}`} class="notebook-card">
+<a href={`${baseUrl}/${notebook.slug}`} class="notebook-card">
   {isSvg ? (
     <div 
       class="notebook-icon" 
